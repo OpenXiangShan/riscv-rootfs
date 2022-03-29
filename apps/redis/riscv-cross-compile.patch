@@ -1,169 +1,25 @@
+From c53706efe3c60d22bfd5211ec17e7edbb28753c6 Mon Sep 17 00:00:00 2001
+From: BigWhiteDog <legend.z@foxmail.com>
+Date: Tue, 29 Mar 2022 15:25:06 +0800
+Subject: [PATCH] a cross compile patch for riscv64
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/Makefile b/Makefile
-index e614ede..a08a646 100644
+index e614ede..68f95dc 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -3,6 +3,7 @@
+@@ -3,7 +3,7 @@
  default: all
  
  .DEFAULT:
-+	cd deps && $(MAKE) $@
- 	cd src && $(MAKE) $@
+-	cd src && $(MAKE) $@
++	cd src && $(MAKE) CC=riscv64-linux-gnu-gcc MALLOC=libc $@
  
  install:
-diff --git a/deps/Makefile b/deps/Makefile
-index e148a33..c1d7c93 100644
---- a/deps/Makefile
-+++ b/deps/Makefile
-@@ -39,7 +39,9 @@ distclean:
- 	-(cd jemalloc && [ -f Makefile ] && $(MAKE) distclean) > /dev/null || true
- 	-(rm -f .make-*)
- 
--.PHONY: distclean
-+clean: distclean
-+
-+.PHONY: distclean clean
- 
- hiredis: .make-prerequisites
- 	@printf '%b %b\n' $(MAKECOLOR)MAKE$(ENDCOLOR) $(BINCOLOR)$@$(ENDCOLOR)
-@@ -77,7 +79,9 @@ JEMALLOC_LDFLAGS= $(LDFLAGS)
- 
- jemalloc: .make-prerequisites
- 	@printf '%b %b\n' $(MAKECOLOR)MAKE$(ENDCOLOR) $(BINCOLOR)$@$(ENDCOLOR)
--	cd jemalloc && ./configure --with-lg-quantum=3 --with-jemalloc-prefix=je_ --enable-cc-silence CFLAGS="$(JEMALLOC_CFLAGS)" LDFLAGS="$(JEMALLOC_LDFLAGS)"
-+	cd jemalloc && ./configure --with-lg-quantum=3 --with-jemalloc-prefix=je_ --enable-cc-silence CFLAGS="$(JEMALLOC_CFLAGS)" LDFLAGS="$(JEMALLOC_LDFLAGS)" --host=riscv64-unknown-linux-gnu
- 	cd jemalloc && $(MAKE) CFLAGS="$(JEMALLOC_CFLAGS)" LDFLAGS="$(JEMALLOC_LDFLAGS)" lib/libjemalloc.a
- 
-+all: hiredis linenoise lua jemalloc
-+
- .PHONY: jemalloc
-diff --git a/deps/hiredis/Makefile b/deps/hiredis/Makefile
-index 9a4de83..8220277 100644
---- a/deps/hiredis/Makefile
-+++ b/deps/hiredis/Makefile
-@@ -35,9 +35,9 @@ define REDIS_TEST_CONFIG
- endef
- export REDIS_TEST_CONFIG
- 
--# Fallback to gcc when $CC is not in $PATH.
--CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
--CXX:=$(shell sh -c 'type $(CXX) >/dev/null 2>/dev/null && echo $(CXX) || echo g++')
-+CC := $(CROSS_COMPILE)gcc
-+CXX:= $(CROSS_COMPILE)g++
-+
- OPTIMIZATION?=-O3
- WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
- DEBUG_FLAGS?= -g -ggdb
-diff --git a/deps/linenoise/Makefile b/deps/linenoise/Makefile
-index 1dd894b..27ad37b 100644
---- a/deps/linenoise/Makefile
-+++ b/deps/linenoise/Makefile
-@@ -1,6 +1,9 @@
- STD=
- WARN= -Wall
- OPT= -Os
-+CC:= $(CROSS_COMPILE)gcc
-+CXX:= $(CROSS_COMPILE)g++
-+
- 
- R_CFLAGS= $(STD) $(WARN) $(OPT) $(DEBUG) $(CFLAGS)
- R_LDFLAGS= $(LDFLAGS)
-diff --git a/deps/lua/src/Makefile b/deps/lua/src/Makefile
-index f3bba2f..3329187 100644
---- a/deps/lua/src/Makefile
-+++ b/deps/lua/src/Makefile
-@@ -5,12 +5,14 @@
- # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
- 
- # Your platform. See PLATS for possible values.
--PLAT= none
-+PLAT= ansi
-+
-+CC:= $(CROSS_COMPILE)gcc
-+CXX:= $(CROSS_COMPILE)g++
- 
--CC?= gcc
- CFLAGS= -O2 -Wall $(MYCFLAGS)
- AR= ar rcu
--RANLIB= ranlib
-+RANLIB= $(CROSS_COMPILE)ranlib
- RM= rm -f
- LIBS= -lm $(MYLIBS)
- 
-@@ -92,7 +94,6 @@ bsd:
- 
- freebsd:
- 	$(MAKE) all MYCFLAGS="-DLUA_USE_LINUX" MYLIBS="-Wl,-E -lreadline"
--
- generic:
- 	$(MAKE) all MYCFLAGS=
- 
-diff --git a/deps/lua/src/luaconf.h b/deps/lua/src/luaconf.h
-index e2cb261..da2a7f4 100644
---- a/deps/lua/src/luaconf.h
-+++ b/deps/lua/src/luaconf.h
-@@ -36,7 +36,7 @@
- #if defined(LUA_USE_LINUX)
- #define LUA_USE_POSIX
- #define LUA_USE_DLOPEN		/* needs an extra library: -ldl */
--#define LUA_USE_READLINE	/* needs some extra libraries */
-+//#define LUA_USE_READLINE	/* needs some extra libraries */
- #endif
- 
- #if defined(LUA_USE_MACOSX)
-diff --git a/redis.conf b/redis.conf
-index c54dba3..0b1c367 100644
---- a/redis.conf
-+++ b/redis.conf
-@@ -66,7 +66,7 @@
- # IF YOU ARE SURE YOU WANT YOUR INSTANCE TO LISTEN TO ALL THE INTERFACES
- # JUST COMMENT THE FOLLOWING LINE.
- # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--bind 127.0.0.1
-+#bind 127.0.0.1
- 
- # Protected mode is a layer of security protection, in order to avoid that
- # Redis instances left open on the internet are accessed and exploited.
-@@ -85,7 +85,7 @@ bind 127.0.0.1
- # you are sure you want clients from other hosts to connect to Redis
- # even if no authentication is configured, nor a specific set of interfaces
- # are explicitly listed using the "bind" directive.
--protected-mode yes
-+protected-mode no
- 
- # Accept connections on the specified port, default is 6379 (IANA #815344).
- # If port 0 is specified Redis will not listen on a TCP socket.
-@@ -133,7 +133,7 @@ tcp-keepalive 300
- 
- # By default Redis does not run as a daemon. Use 'yes' if you need it.
- # Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
--daemonize no
-+daemonize yes
- 
- # If you run Redis from upstart or systemd, Redis can interact with your
- # supervision tree. Options:
-@@ -215,9 +215,9 @@ always-show-logo yes
- #
- #   save ""
- 
--save 900 1
--save 300 10
--save 60 10000
-+#save 900 1
-+#save 300 10
-+#save 60 10000
- 
- # By default Redis will stop accepting writes if RDB snapshots are enabled
- # (at least one save point) and the latest background save failed.
-diff --git a/src/Makefile b/src/Makefile
-index 86e0b3f..6a07920 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -11,6 +11,8 @@
- #
- # Dependencies are stored in the Makefile.dep file. To rebuild this file
- # Just use 'make dep', but this is only needed by developers.
-+CC:= $(CROSS_COMPILE)gcc
-+CXX:= $(CROSS_COMPILE)g++
- 
- release_hdr := $(shell sh -c './mkreleasehdr.sh')
- uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+ 	cd src && $(MAKE) $@
+-- 
+2.35.1
+
