@@ -3,6 +3,13 @@
 pwd
 ls
 echo 12345
-/root/benchmark/stream
-ifconfig -a
-/root/redis/redis-server
+ifconfig lo 127.0.0.1
+/root/redis/redis-server /root/redis/redis.conf
+sleep 1
+ps -a
+netstat -apnt
+ifconfig
+cat /root/redis/warmup-redis.cmd | /root/redis/redis-cli --pipe
+/root/new_before_workload
+cat /root/redis/run-redis.cmd | /root/redis/redis-cli --pipe
+/root/after_workload
