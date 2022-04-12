@@ -2,4 +2,10 @@
 !inittab
 !inittab-spec
 !spec_gen.py
+!default.script
+!interfaces.dhcp
+!passwd
+!group
+!dropbear_rsa_host_key
+run.sh
 
