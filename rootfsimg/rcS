@@ -1,8 +1,12 @@
 #!/bin/sh
 
-pwd
-ls
-echo 12345
-/root/benchmark/stream
-ifconfig -a
-/root/redis/redis-server
+#pwd
+#ls
+#echo 12345
+# /root/benchmark/stream
+# ifconfig -a
+#/root/redis/redis-server
+# /root/redis/run-redis.sh
+ifconfig lo 127.0.0.1
+/spec_common/before_workload
+/root/redis/redis-server /root/redis/redis.conf 
