@@ -32,3 +32,6 @@ file /etc/inittab ${RISCV_ROOTFS_HOME}/rootfsimg/inittab 755 0 0
 #file /etc/group ${RISCV_ROOTFS_HOME}/rootfsimg/etc/group 755 0 0
 #file /etc/profile ${RISCV_ROOTFS_HOME}/rootfsimg/profile 755 0 0
 slink /init /bin/busybox 755 0 0
+
+file /bin/ethtool ${RISCV_ROOTFS_HOME}/rootfsimg/build/ethtool 755 0 0
+file /bin/mdio ${RISCV_ROOTFS_HOME}/rootfsimg/build/mdio 755 0 0
