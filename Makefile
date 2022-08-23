@@ -1,6 +1,6 @@
 $(shell mkdir -p rootfsimg/build)
 
-APPS = mdio ethtool hello stream busybox redis dwarf/md5 dwarf/sort dwarf/wordcount
+APPS = mdio ethtool busybox
 APPS_DIR = $(addprefix apps/, $(APPS))
 
 .PHONY: rootfsimg $(APPS_DIR) clean
