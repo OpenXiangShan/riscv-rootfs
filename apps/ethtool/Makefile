@@ -3,7 +3,7 @@ NAME = ethtool
 include $(RISCV_ROOTFS_HOME)/Makefile.app
 
 REPO_PATH = repo
-TARBALL = ethtool-4.20.tar.gz
+TARBALL = ethtool-4.19.tar.gz
 
 CONFIG_FLAGS = CC=riscv64-unknown-linux-gnu-gcc \
 			   CXX=riscv64-unknown-linux-gnu-g++ \
