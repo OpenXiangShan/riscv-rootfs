@@ -10,7 +10,8 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/astar/BigLakes2048.bin",
       "${SPEC}/cpu2006_run_dir/astar/BigLakes2048.cfg"
     ],
-    [ "BigLakes2048.cfg" ]
+    [ "BigLakes2048.cfg" ],
+    [ "BigLakes2048.out" ]
   ),
   "astar_rivers": (
     [
@@ -18,63 +19,72 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/astar/rivers.bin",
       "${SPEC}/cpu2006_run_dir/astar/rivers.cfg"
     ],
-    [ "rivers.cfg" ]
+    [ "rivers.cfg" ],
+    [ "rivers.out" ]
   ),
   "bwaves": (
     [
       "${SPEC}/spec06_exe/bwaves_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/bwaves/bwaves.in"
     ],
-    []
+    [],
+    [ "bwaves.out", "bwaves2.out", "bwaves3.out" ]
   ),
   "bzip2_chicken": (
     [
       "${SPEC}/spec06_exe/bzip2_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/bzip2/chicken.jpg"
     ],
-    [ "chicken.jpg", "30" ]
+    [ "chicken.jpg", "30" ],
+    [ "chicken.jpg.out" ]
   ),
   "bzip2_combined": (
     [
       "${SPEC}/spec06_exe/bzip2_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/bzip2/input.combined"
     ],
-    [ "input.combined", "200" ]
+    [ "input.combined", "200" ],
+    [ "input.combined.out" ]
   ),
   "bzip2_html": (
     [
       "${SPEC}/spec06_exe/bzip2_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/bzip2/text.html"
     ],
-    [ "text.html", "280" ]
+    [ "text.html", "280" ],
+    [ "text.html.out" ]
   ),
   "bzip2_liberty": (
     [
       "${SPEC}/spec06_exe/bzip2_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/bzip2/liberty.jpg"
     ],
-    [ "liberty.jpg", "30" ]
+    [ "liberty.jpg", "30" ],
+    [ "liberty.jpg.out" ]
   ),
   "bzip2_program": (
     [
       "${SPEC}/spec06_exe/bzip2_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/bzip2/input.program"
     ],
-    [ "input.program", "280" ]
+    [ "input.program", "280" ],
+    [ "input.program.out" ]
   ),
   "bzip2_source": (
     [
       "${SPEC}/spec06_exe/bzip2_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/bzip2/input.source"
     ],
-    [ "input.source", "280" ]
+    [ "input.source", "280" ],
+    [ "input.source.out" ]
   ),
   "cactusADM": (
     [
       "${SPEC}/spec06_exe/cactusADM_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/cactusADM/benchADM.par"
     ],
-    [ "benchADM.par" ]
+    [ "benchADM.par" ],
+    [ "benchADM.out" ]
   ),
   "calculix": (
     [
@@ -84,14 +94,22 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/calculix/hyperviscoplastic.inp",
       "${SPEC}/cpu2006_run_dir/calculix/hyperviscoplastic.sta"
     ],
-    [ "-i", "hyperviscoplastic" ]
+    [ "-i", "hyperviscoplastic" ],
+    [ "hyperviscoplastic.dat", "SPECtestformatmodifier_z.txt" ]
   ),
   "dealII": (
     [
       "${SPEC}/spec06_exe/dealII_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/dealII/DummyData"
     ],
-    [ "23" ]
+    [ "23" ],
+    [ "grid-10.eps", "grid-11.eps", "grid-12.eps", "grid-13.eps", "grid-14.eps",
+      "grid-15.eps", "grid-16.eps", "grid-17.eps", "grid-18.eps", "grid-19.eps",
+      "grid-20.eps", "grid-21.eps", "grid-22.eps", "grid-23.eps", "grid-9.eps",
+      "log", "solution-10.gmv", "solution-11.gmv", "solution-12.gmv", "solution-13.gmv",
+      "solution-14.gmv", "solution-15.gmv", "solution-16.gmv", "solution-17.gmv", "solution-18.gmv",
+      "solution-19.gmv", "solution-20.gmv", "solution-21.gmv", "solution-22.gmv", "solution-23.gmv",
+      "olution-9.gmv" ]
   ),
   "gamess_cytosine": (
     [
@@ -99,7 +117,8 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/gamess/cytosine.2.config",
       "${SPEC}/cpu2006_run_dir/gamess/cytosine.2.inp"
     ],
-    [ "<", "cytosine.2.config" ]
+    [ "<", "cytosine.2.config" ],
+    [ "cytosine.2.out" ]
   ),
   "gamess_gradient": (
     [
@@ -107,7 +126,8 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/gamess/h2ocu2+.gradient.config",
       "${SPEC}/cpu2006_run_dir/gamess/h2ocu2+.gradient.inp"
     ],
-    [ "<", "h2ocu2+.gradient.config" ]
+    [ "<", "h2ocu2+.gradient.config" ],
+    [ "h2ocu+.gradient.out" ]
   ),
   "gamess_triazolium": (
     [
@@ -115,70 +135,80 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/gamess/triazolium.config",
       "${SPEC}/cpu2006_run_dir/gamess/triazolium.inp"
     ],
-    [ "<", "triazolium.config" ]
+    [ "<", "triazolium.config" ],
+    [ "triazolium.out" ]
   ),
   "gcc_166": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/166.i"
     ],
-    [ "166.i", "-o", "166.s" ]
+    [ "166.i", "-o", "166.s" ],
+    [ "166.s" ]
   ),
   "gcc_200": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/200.i"
     ],
-    [ "200.i", "-o", "200.s" ]
+    [ "200.i", "-o", "200.s" ],
+    [ "200.s" ]
   ),
   "gcc_cpdecl": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/cp-decl.i"
     ],
-    [ "cp-decl.i", "-o", "cp-decl.s" ]
+    [ "cp-decl.i", "-o", "cp-decl.s" ],
+    [ "cp-decl.s" ]
   ),
   "gcc_expr2": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/expr2.i"
     ],
-    [ "expr2.i", "-o", "expr2.s" ]
+    [ "expr2.i", "-o", "expr2.s" ],
+    [ "expr2.s" ]
   ),
   "gcc_expr": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/expr.i"
     ],
-    [ "expr.i", "-o", "expr.s" ]
+    [ "expr.i", "-o", "expr.s" ],
+    [ "expr.s" ]
   ),
   "gcc_g23": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/g23.i"
     ],
-    [ "g23.i", "-o", "g23.s" ]
+    [ "g23.i", "-o", "g23.s" ],
+    [ "g23.s" ]
   ),
   "gcc_s04": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/s04.i"
     ],
-    [ "s04.i", "-o", "s04.s" ]
+    [ "s04.i", "-o", "s04.s" ],
+    [ "s04.s" ]
   ),
   "gcc_scilab": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/scilab.i"
     ],
-    [ "scilab.i", "-o", "scilab.s" ]
+    [ "scilab.i", "-o", "scilab.s" ],
+    [ "scilab.s" ]
   ),
   "gcc_typeck": (
     [
       "${SPEC}/spec06_exe/gcc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gcc/c-typeck.i"
     ],
-    [ "c-typeck.i", "-o", "c-typeck.s" ]
+    [ "c-typeck.i", "-o", "c-typeck.s" ],
+    [ "c-typeck.s" ]
   ),
   "GemsFDTD": (
     [
@@ -187,59 +217,66 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/GemsFDTD/sphere.pec",
       "${SPEC}/cpu2006_run_dir/GemsFDTD/yee.dat"
     ],
-    []
+    [],
+    [ "sphere_td.nft" ]
   ),
   "gobmk_13x13": (
     [
       "${SPEC}/spec06_exe/gobmk_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gobmk/13x13.tst",
-      "dir games /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
-      "dir golois /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
+      "dir games /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
+      "dir golois /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
     ],
-    [ "--quiet", "--mode", "gtp", "<", "13x13.tst" ]
+    [ "--quiet", "--mode", "gtp", "<", "13x13.tst" ],
+    [ "13x13.out" ]
   ),
   "gobmk_nngs": (
     [
       "${SPEC}/spec06_exe/gobmk_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gobmk/nngs.tst",
-      "dir games /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
-      "dir golois /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
+      "dir games /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
+      "dir golois /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
     ],
-    [ "--quiet", "--mode", "gtp", "<", "nngs.tst" ]
+    [ "--quiet", "--mode", "gtp", "<", "nngs.tst" ],
+    [ "nngs.out" ]
   ),
   "gobmk_score2": (
     [
       "${SPEC}/spec06_exe/gobmk_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gobmk/score2.tst",
-      "dir games /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
-      "dir golois /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
+      "dir games /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
+      "dir golois /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
     ],
-    [ "--quiet", "--mode", "gtp", "<", "score2.tst" ]
+    [ "--quiet", "--mode", "gtp", "<", "score2.tst" ],
+    [ "score2.out" ]
   ),
   "gobmk_trevorc": (
     [
       "${SPEC}/spec06_exe/gobmk_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gobmk/trevorc.tst",
-      "dir games /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
-      "dir golois /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
+      "dir games /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
+      "dir golois /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
     ],
-    [ "--quiet", "--mode", "gtp", "<", "trevorc.tst" ]
+    [ "--quiet", "--mode", "gtp", "<", "trevorc.tst" ],
+    [ "trevorc.out" ]
   ),
   "gobmk_trevord": (
     [
       "${SPEC}/spec06_exe/gobmk_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gobmk/trevord.tst",
-      "dir games /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
-      "dir golois /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
+      "dir games /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/games",
+      "dir golois /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/gobmk/golois"
     ],
-    [ "--quiet", "--mode", "gtp", "<", "trevord.tst" ]
+    [ "--quiet", "--mode", "gtp", "<", "trevord.tst" ],
+    [ "trevord.out" ]
   ),
   "gromacs": (
     [
       "${SPEC}/spec06_exe/gromacs_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/gromacs/gromacs.tpr"
     ],
-    [ "-silent", "-deffnm", "gromacs.tpr", "-nice", "0" ]
+    [ "-silent", "-deffnm", "gromacs.tpr", "-nice", "0" ],
+    [ "gromacs.out" ]
   ),
   "h264ref_foreman.baseline": (
     [
@@ -247,7 +284,8 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/h264ref/foreman_ref_encoder_baseline.cfg",
       "${SPEC}/cpu2006_run_dir/h264ref/foreman_qcif.yuv"
     ],
-    [ "-d", "foreman_ref_encoder_baseline.cfg" ]
+    [ "-d", "foreman_ref_encoder_baseline.cfg" ],
+    [ "foreman_ref_baseline_encodelog.out", "foreman_ref_baseline_leakybucketparam.cfg" ]
   ),
   "h264ref_foreman.main": (
     [
@@ -255,7 +293,8 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/h264ref/foreman_ref_encoder_main.cfg",
       "${SPEC}/cpu2006_run_dir/h264ref/foreman_qcif.yuv"
     ],
-    [ "-d", "foreman_ref_encoder_main.cfg" ]
+    [ "-d", "foreman_ref_encoder_main.cfg" ],
+    [ "foreman_ref_main_encodelog.out", "foreman_ref_main_leakybucketparam.cfg" ]
   ),
   "h264ref_sss": (
     [
@@ -263,7 +302,8 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/h264ref/sss_encoder_main.cfg",
       "${SPEC}/cpu2006_run_dir/h264ref/sss.yuv"
     ],
-    [ "-d", "sss_encoder_main.cfg" ]
+    [ "-d", "sss_encoder_main.cfg" ],
+    [ "sss_main_encodelog.out", "sss_main_leakybucketparam.cfg" ]
   ),
   "hmmer_nph3": (
     [
@@ -271,14 +311,16 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/hmmer/nph3.hmm",
       "${SPEC}/cpu2006_run_dir/hmmer/swiss41"
     ],
-    [ "nph3.hmm", "swiss41" ]
+    [ "nph3.hmm", "swiss41" ],
+    [ "nph3.out" ]
   ),
   "hmmer_retro": (
     [
       "${SPEC}/spec06_exe/hmmer_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/hmmer/retro.hmm"
     ],
-    [ "--fixed", "0", "--mean", "500", "--num", "500000", "--sd", "350", "--seed", "0", "retro.hmm" ]
+    [ "--fixed", "0", "--mean", "500", "--num", "500000", "--sd", "350", "--seed", "0", "retro.hmm" ],
+    [ "retro.out" ]
   ),
   "lbm": (
     [
@@ -286,48 +328,55 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/lbm/100_100_130_ldc.of",
       "${SPEC}/cpu2006_run_dir/lbm/lbm.in"
     ],
-    [ "3000", "reference.dat", "0", "0", "100_100_130_ldc.of" ]
+    [ "3000", "reference.dat", "0", "0", "100_100_130_ldc.of" ],
+    [ "lbm.out" ]
   ),
   "leslie3d": (
     [
       "${SPEC}/spec06_exe/leslie3d_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/leslie3d/leslie3d.in"
     ],
-    [ "<", "leslie3d.in" ]
+    [ "<", "leslie3d.in" ],
+    [ "leslie3d.out" ]
   ),
   "libquantum": (
     [
       "${SPEC}/spec06_exe/libquantum_base.riscv64-linux-gnu-gcc-9.3.0"
     ],
-    [ "1397", "8" ]
+    [ "1397", "8" ],
+    [ "ref.out" ]
   ),
   "mcf": (
     [
       "${SPEC}/spec06_exe/mcf_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/mcf/inp.in"
     ],
-    [ "inp.in" ]
+    [ "inp.in" ],
+    [ "inp.out", "mcf.out" ]
   ),
   "milc": (
     [
       "${SPEC}/spec06_exe/milc_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/milc/su3imp.in"
     ],
-    [ "<", "su3imp.in" ]
+    [ "<", "su3imp.in" ],
+    [ "su3imp.out" ]
   ),
   "namd": (
     [
       "${SPEC}/spec06_exe/namd_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/namd/namd.input"
     ],
-    [ "--input", "namd.input", "--iterations", "38", "--output", "namd.out" ]
+    [ "--input", "namd.input", "--iterations", "38", "--output", "namd.out" ],
+    [ "namd.out" ]
   ),
   "omnetpp": (
     [
       "${SPEC}/spec06_exe/omnetpp_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/omnetpp/omnetpp.ini"
     ],
-    [ "omnetpp.ini" ]
+    [ "omnetpp.ini" ],
+    [ "omnetpp.log", "omnetpp.sca" ]
   ),
   "perlbench_checkspam": (
     [
@@ -335,10 +384,11 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/perlbench/cpu2006_mhonarc.rc",
       "${SPEC}/cpu2006_run_dir/perlbench/checkspam.pl",
       "${SPEC}/cpu2006_run_dir/perlbench/checkspam.in",
-      "dir lib /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/lib",
-      "dir rules /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/rules"
+      "dir lib /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/lib",
+      "dir rules /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/rules"
     ],
-    [ "-I./lib", "checkspam.pl", "2500", "5", "25", "11", "150", "1", "1", "1", "1" ]
+    [ "-I./lib", "checkspam.pl", "2500", "5", "25", "11", "150", "1", "1", "1", "1" ],
+    [ "checkspam.2500.5.25.11.150.1.1.1.1.out" ]
   ),
   "perlbench_diffmail": (
     [
@@ -346,10 +396,11 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/perlbench/cpu2006_mhonarc.rc",
       "${SPEC}/cpu2006_run_dir/perlbench/diffmail.pl",
       "${SPEC}/cpu2006_run_dir/perlbench/diffmail.in",
-      "dir lib /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/lib",
-      "dir rules /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/rules"
+      "dir lib /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/lib",
+      "dir rules /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/rules"
     ],
-    [ "-I./lib", "diffmail.pl", "4", "800", "10", "17", "19", "300" ]
+    [ "-I./lib", "diffmail.pl", "4", "800", "10", "17", "19", "300" ],
+    [ "diffmail.4.800.10.17.19.300.out" ]
   ),
   "perlbench_splitmail": (
     [
@@ -357,73 +408,83 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/perlbench/cpu2006_mhonarc.rc",
       "${SPEC}/cpu2006_run_dir/perlbench/splitmail.pl",
       "${SPEC}/cpu2006_run_dir/perlbench/splitmail.in",
-      "dir lib /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/lib",
-      "dir rules /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/rules"
+      "dir lib /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/lib",
+      "dir rules /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/perlbench/rules"
     ],
-    [ "-I./lib", "splitmail.pl", "1600", "12", "26", "16", "4500" ]
+    [ "-I./lib", "splitmail.pl", "1600", "12", "26", "16", "4500" ],
+    [ "splitmail.1600.12.26.16.4500.out" ]
   ),
   "povray": (
     [
       "${SPEC}/spec06_exe/povray_base.riscv64-linux-gnu-gcc-9.3.0",
-      "dir . /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/povray"
+      "dir . /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/povray"
     ],
-    [ "SPEC-benchmark-ref.ini" ]
+    [ "SPEC-benchmark-ref.ini" ],
+    [ "SPEC-benchmark.log", "SPEC-benchmark.tga" ]
   ),
   "sjeng": (
     [
       "${SPEC}/spec06_exe/sjeng_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/sjeng/ref.txt"
     ],
-    [ "ref.txt" ]
+    [ "ref.txt" ],
+    [ "ref.out" ]
   ),
   "soplex_pds-50": (
     [
       "${SPEC}/spec06_exe/soplex_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/soplex/pds-50.mps"
     ],
-    [ "-s1", "-e", "-m45000", "pds-50.mps" ]
+    [ "-s1", "-e", "-m45000", "pds-50.mps" ],
+    [ "pds-50.mps.out", "pds-50.mps.stderr" ]
   ),
   "soplex_ref": (
     [
       "${SPEC}/spec06_exe/soplex_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/soplex/ref.mps"
     ],
-    [ "-m3500", "ref.mps" ]
+    [ "-m3500", "ref.mps" ],
+    [ "ref.out", "ref.stderr" ]
   ),
   "sphinx3": (
     [
-      "${SPEC}/spec06_exe/sphinx_livepretend_base.riscv64-linux-gnu-gcc-9.3.0",
-      "dir . /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/sphinx3"
+      "${SPEC}/spec06_exe/sphinx3_base.riscv64-linux-gnu-gcc-9.3.0",
+      "dir . /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/sphinx3"
     ],
-    [ "ctlfile", ".", "args.an4" ]
+    [ "ctlfile", ".", "args.an4" ],
+    [ "an4.log", "considered.out", "total_considered.out" ]
   ),
   "tonto": (
     [
       "${SPEC}/spec06_exe/tonto_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/tonto/stdin"
     ],
-    []
+    [],
+    [ "stdout" ]
   ),
   "wrf": (
     [
       "${SPEC}/spec06_exe/wrf_base.riscv64-linux-gnu-gcc-9.3.0",
-      "dir . /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/wrf"
+      "dir . /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/wrf"
     ],
-    []
+    [],
+    [ "rsl.out.0000" ]
   ),
   "xalancbmk": (
     [
-      "${SPEC}/spec06_exe/Xalan_base.riscv64-linux-gnu-gcc-9.3.0",
-      "dir . /bigdata/xs-workloads/spec/spec-all/cpu2006_run_dir/xalancbmk"
+      "${SPEC}/spec06_exe/xalancbmk_base.riscv64-linux-gnu-gcc-9.3.0",
+      "dir . /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/xalancbmk"
     ],
-    [ "-v", "t5.xml", "xalanc.xsl" ]
+    [ "-v", "t5.xml", "xalanc.xsl" ],
+    [ "ref.out" ]
   ),
   "zeusmp": (
     [
       "${SPEC}/spec06_exe/zeusmp_base.riscv64-linux-gnu-gcc-9.3.0",
       "${SPEC}/cpu2006_run_dir/zeusmp/zmp_inp"
     ],
-    []
+    [],
+    [ "tsl000aa" ]
   ),
   # WARNING: this is SPEC test
   "gamess_exam29": (
@@ -432,7 +493,8 @@ spec_info = {
       "${SPEC}/cpu2006_run_dir/gamess/exam29.config",
       "${SPEC}/cpu2006_run_dir/gamess/exam29.inp"
     ],
-    [ "<", "exam29.config" ]
+    [ "<", "exam29.config" ],
+    [ "exam29.out" ]
   ),
 }
 
@@ -532,10 +594,12 @@ def generate_run_sh(specs, withTrap=False):
     lines.append("date -R")
     spec_bin = spec_info[spec][0][0].split("/")[-1]
     spec_cmd = " ".join(spec_info[spec][1])
+    spec_check = " ".join(spec_info[spec][2])
     lines.append(f"cd /spec && ./{spec_bin} {spec_cmd}")
     lines.append("date -R")
     lines.append("set +x")
     lines.append(f"echo '======== END   {spec} ========'")
+    lines.append(f"md5sum {spec_check}")
   lines.append("echo '===== Finish running SPEC2006 ====='")
   if withTrap:
     lines.append("/spec_common/trap")
