@@ -3,14 +3,14 @@ NAME = zlib
 include $(RISCV_ROOTFS_HOME)/Makefile.app
 
 REPO_PATH = repo
-TARBALL = zlib-1.2.12.tar.gz
+TARBALL = zlib-1.2.13.tar.gz
 CONFIG_FLAGS = --prefix=$(shell realpath build)
 
 $(TARBALL):
 	curl -O https://www.zlib.net/$(TARBALL)
 
 $(REPO_PATH): $(TARBALL)
-	tar xf $(TARBALL)
+	if [ !`tar xf $(TARBALL)` ]; then echo "\033[1;31mUpdate zlib version in apps/zlib/Makefile\033[0m"; fi
 	rm -rf $@
 	mv $(shell basename $(TARBALL) .tar.gz) $@
 
