@@ -19,7 +19,10 @@ $(REPO_PATH): $(TARBALL)
 	mv $(shell basename $(TARBALL) .tar.bz2) $@
 
 $(APP): | $(REPO_PATH)
+	make -s -C ../zlib install
 	cd $(REPO_PATH) && ./configure $(CONFIG_FLAGS)
 	$(MAKE) -C $(REPO_PATH)
 	$(MAKE) -C $(REPO_PATH) install
 	cd build && ln -sf sbin/dropbear ssh-dropbear
+	ln -sf $(abspath build/bin/dbclient) ${RISCV_ROOTFS_HOME}/rootfsimg/build/
+	ln -sf $(abspath build/bin/dropbearkey) ${RISCV_ROOTFS_HOME}/rootfsimg/build/

@@ -1,6 +1,6 @@
 $(shell mkdir -p rootfsimg/build)
 
-APPS = mdio ethtool busybox
+APPS = mdio ethtool busybox zlib stream ssh-dropbear tcpdump
 APPS_DIR = $(addprefix apps/, $(APPS))
 
 .PHONY: rootfsimg $(APPS_DIR) clean
