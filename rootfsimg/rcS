@@ -3,13 +3,27 @@
 pwd
 ls
 echo 12345
-ifconfig lo 127.0.0.1
-/root/redis/redis-server /root/redis/redis.conf
-sleep 1
-ps -a
-netstat -apnt
-ifconfig
-cat /root/redis/warmup-redis.cmd | /root/redis/redis-cli --pipe
-/root/new_before_workload
-cat /root/redis/run-redis.cmd | /root/redis/redis-cli --pipe
+cat /proc/meminfo
+# ls -l /sys/block
+# cat /sys/block/mmcblk0/dev
+# echo !/dev
+# ls -l /dev
+# echo !devices
+# cat /proc/devices
+# mkdir /mnt
+# mount -o ro /dev/mmcblk0 /mnt
+/root/notip_before_workload
+# /root/mspec06/libquantum 1397 8
+# /root/mspec06/hmmer --fixed 0 --mean 500 --num 500000 --sd 350 --seed 0 /root/mspec06/retro.hmm
+/root/mspec06/hmmer /root/mspec06/nph3.hmm /root/mspec06/swiss41
+# /root/npb/bt.A.x
+# /root/npb/cg.A.x
+# /root/npb/dc.A.x
+# /root/npb/ep.A.x
+# /root/npb/ft.A.x
+# /root/npb/is.A.x
+# /root/npb/lu.A.x
+# /root/npb/mg.A.x
+# /root/npb/sp.A.x
+# /root/npb/ua.A.x
 /root/after_workload

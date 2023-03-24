@@ -1,6 +1,6 @@
 $(shell mkdir -p rootfsimg/build)
 
-APPS = hello stream busybox redis dwarf/md5 dwarf/sort dwarf/wordcount new_before_workload after_workload
+APPS = hello stream busybox redis dwarf/md5 dwarf/sort dwarf/wordcount new_before_workload notip_before_workload after_workload test_amo
 APPS_DIR = $(addprefix apps/, $(APPS))
 
 .PHONY: rootfsimg $(APPS_DIR) clean
