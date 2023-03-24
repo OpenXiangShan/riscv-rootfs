@@ -589,11 +589,12 @@ def generate_run_sh(specs, withTrap=False):
   lines.append("#!/bin/sh")
   lines.append("echo '===== Start running SPEC2006 ====='")
   for spec in specs:
-    lines.append(f"echo '======== BEGIN {spec} ========'")
-    lines.append("set -x")
-    lines.append("date -R")
     spec_bin = spec_info[spec][0][0].split("/")[-1]
     spec_cmd = " ".join(spec_info[spec][1])
+    lines.append(f"echo '======== BEGIN {spec} ========'")
+    lines.append("set -x")
+    lines.append(f"md5sum /spec/{spec_bin}")
+    lines.append("date -R")
     spec_check = " ".join(spec_info[spec][2])
     lines.append(f"cd /spec && ./{spec_bin} {spec_cmd}")
     lines.append("date -R")
