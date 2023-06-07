@@ -1,0 +1,113 @@
+dir /bin 755 0 0
+dir /etc 755 0 0
+dir /dev 755 0 0
+dir /lib 755 0 0
+dir /proc 755 0 0
+dir /sbin 755 0 0
+dir /sys 755 0 0
+dir /tmp 755 0 0
+dir /usr 755 0 0
+dir /mnt 755 0 0
+dir /usr/bin 755 0 0
+dir /usr/lib 755 0 0
+dir /usr/sbin 755 0 0
+dir /var 755 0 0
+dir /var/tmp 755 0 0
+dir /root 755 0 0
+dir /var/log 755 0 0
+
+nod /dev/console 644 0 0 c 5 1
+nod /dev/null 644 0 0 c 1 3
+
+file /lib/ld-linux-riscv64-lp64d.so.1 ${RISCV}/sysroot/lib/ld-linux-riscv64-lp64d.so.1 755 0 0
+file /lib/libc.so.6 ${RISCV}/sysroot/lib/libc.so.6 755 0 0
+file /lib/libresolv.so.2 ${RISCV}/sysroot/lib/libresolv.so.2 755 0 0
+file /lib/libm.so.6 ${RISCV}/sysroot/lib/libm.so.6 755 0 0
+file /lib/libdl.so.2 ${RISCV}/sysroot/lib/libdl.so.2 755 0 0
+file /lib/libpthread.so.0 ${RISCV}/sysroot/lib/libpthread.so.0 755 0 0
+file /lib/libgfortran.so.5.0.0 ${RISCV}/sysroot/lib/libgfortran.so.5.0.0 755 0 0
+slink /lib/libgfortran.so.5 /lib/libgfortran.so.5.0.0 755 0 0
+slink /lib/libgfortran.so /lib/libgfortran.so.5.0.0 755 0 0
+file /lib/libgomp.so.1.0.0 ${RISCV}/sysroot/lib/libgomp.so.1.0.0 755 0 0
+slink /lib/libgomp.so.1 /lib/libgomp.so.1.0.0 755 0 0
+slink /lib/libgomp.so /lib/libgomp.so.1.0.0 755 0 0
+file /lib/libgcc_s.so.1 ${RISCV}/sysroot/lib/libgcc_s.so.1 755 0 0
+file /lib/libstdc++.so.6 ${RISCV}/sysroot/lib/libstdc++.so.6 755 0 0
+file /lib/librt.so.1 ${RISCV}/sysroot/lib/librt.so.1 755 0 0
+file /lib/libz.so.1.2.11 ${MYRVLIB_PATH}/lib/libz.so.1.2.11 755 0 0
+slink /lib/libz.so /lib/libz.so.1.2.11 755 0 0
+slink /lib/libz.so.1 /lib/libz.so.1.2.11 755 0 0
+file /lib/libuuid.so.1.3.0 ${MYRVLIB_PATH}/lib/libuuid.so.1.3.0 755 0 0
+slink /lib/libuuid.so /lib/libuuid.so.1.3.0 755 0 0
+slink /lib/libuuid.so.1 /lib/libuuid.so.1.3.0 755 0 0
+file /lib/libxapian.so.22 /nfs/home/zhangchuanqi/lvna/new_micro/tailbench-v0.9/xapian/xapian-core-1.2.13/install/lib/libxapian.so.22 755 0 0
+
+file /bin/busybox ${RISCV_ROOTFS_HOME}/rootfsimg/build/busybox 755 0 0
+file /etc/inittab ${RISCV_ROOTFS_HOME}/rootfsimg/inittab-autorun 755 0 0
+slink /init /bin/busybox 755 0 0
+
+dir /root/benchmark 755 0 0
+file /root/benchmark/stream ${RISCV_ROOTFS_HOME}/rootfsimg/build/stream 755 0 0
+
+file /root/new_before_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/new_before_workload 755 0 0
+file /root/notip_before_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/notip_before_workload 755 0 0
+file /root/after_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/after_workload 755 0 0
+file /root/hello ${RISCV_ROOTFS_HOME}/rootfsimg/build/hello 755 0 0
+
+# modified spec06
+dir /root/mspec06 755 0 0
+file /root/mspec06/hmmer /nfs/home/zhangchuanqi/lvna/benchmarks/spec2006-lite/456.hmmer/build/hmmer 755 0 0
+file /root/mspec06/nph3.hmm /nfs-nvme/home/share/cpu2006v99/benchspec/CPU2006/456.hmmer/data/ref/input/nph3.hmm 755 0 0
+file /root/mspec06/retro.hmm /nfs-nvme/home/share/cpu2006v99/benchspec/CPU2006/456.hmmer/data/ref/input/retro.hmm 755 0 0
+file /root/mspec06/swiss41 /nfs-nvme/home/share/cpu2006v99/benchspec/CPU2006/456.hmmer/data/ref/input/swiss41 755 0 0
+file /root/mspec06/libquantum /nfs/home/zhangchuanqi/lvna/benchmarks/spec2006-lite/462.libquantum/build/libquantum 755 0 0
+
+
+# redis
+dir /root/redis 755 0 0
+#file /root/redis/redis-server ${RISCV_ROOTFS_HOME}/rootfsimg/build/redis-server 755 0 0
+#file /root/redis/redis-cli ${RISCV_ROOTFS_HOME}/apps/redis/repo/src/redis-cli 755 0 0
+#file /root/redis/redis-benchmark ${RISCV_ROOTFS_HOME}/apps/redis/repo/src/redis-benchmark 755 0 0
+#file /root/redis/redis.conf ${RISCV_ROOTFS_HOME}/apps/redis/repo/redis.conf 644 0 0
+#file /root/redis/run-redis.sh ${RISCV_ROOTFS_HOME}/apps/redis/scripts/run-redis.sh 644 0 0
+#file /root/redis/warmup-redis.cmd ${RISCV_ROOTFS_HOME}/rootfsimg/scripts/redis-cmd/user-timeline-warmup-redis.cmd 444 0 0
+#file /root/redis/run-redis.cmd ${RISCV_ROOTFS_HOME}/rootfsimg/scripts/redis-cmd/user-timeline-run-redis.cmd 444 0 0
+
+#xapian
+#dir /root/xapian 755 0 0
+#file /root/xapian/xapian_integrated /nfs/home/zhangchuanqi/lvna/new_micro/tailbench-v0.9/xapian/xapian_integrated 755 0 0
+#dir /root/xapian/data 755 0 0
+#file /root/xapian/data/terms.in /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/terms.in 755 0 0
+#dir /root/xapian/data/wiki 755 0 0
+#file /root/xapian/data/wiki/postlist.baseA /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/postlist.baseA 755 0 0
+#file /root/xapian/data/wiki/record.DB /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/record.DB 755 0 0
+#file /root/xapian/data/wiki/termlist.baseA /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/termlist.baseA 755 0 0
+#file /root/xapian/data/wiki/termlist.DB /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/termlist.DB 755 0 0
+#file /root/xapian/data/wiki/record.baseB /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/record.baseB 755 0 0
+#file /root/xapian/data/wiki/postlist.DB /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/postlist.DB 755 0 0
+#file /root/xapian/data/wiki/iamchert /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/iamchert 755 0 0
+#file /root/xapian/data/wiki/record.baseA /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/record.baseA 755 0 0
+#file /root/xapian/data/wiki/postlist.baseB /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/postlist.baseB 755 0 0
+#file /root/xapian/data/wiki/flintlock /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/flintlock 755 0 0
+#file /root/xapian/data/wiki/position.baseB /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/position.baseB 755 0 0
+#file /root/xapian/data/wiki/position.baseA /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/position.baseA 755 0 0
+#file /root/xapian/data/wiki/termlist.baseB /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/termlist.baseB 755 0 0
+#file /root/xapian/data/wiki/position.DB /nfs/home/zhangchuanqi/lvna/new_micro/tailbench.inputs/xapian/wiki/position.DB 755 0 0
+
+file /root/xapian/run.sh ${RISCV_ROOTFS_HOME}/rootfsimg/scripts/xapian-cmd/run.sh 755 0 0
+
+#npb
+dir /root/npb 755 0 0
+file /root/npb/bt.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/bt.A.x 755 0 0
+file /root/npb/cg.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/cg.A.x 755 0 0
+file /root/npb/dc.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/dc.A.x 755 0 0
+file /root/npb/ep.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/ep.A.x 755 0 0
+file /root/npb/ft.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/ft.A.x 755 0 0
+file /root/npb/is.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/is.A.x 755 0 0
+file /root/npb/lu.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/lu.A.x 755 0 0
+file /root/npb/mg.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/mg.A.x 755 0 0
+file /root/npb/sp.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/sp.A.x 755 0 0
+file /root/npb/ua.A.x /nfs/home/zhangchuanqi/lvna/benchmarks/NPB3.3.1/NPB3.3-SER/bin/ua.A.x 755 0 0
+
+dir /etc/init.d 755 0 0
+file /etc/init.d/rcS ${RISCV_ROOTFS_HOME}/rootfsimg/rcS 755 0 0
