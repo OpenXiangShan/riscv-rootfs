@@ -13,3 +13,4 @@ $(APPS_DIR): %:
 clean:
 	-$(foreach app, $(APPS_DIR), $(MAKE) -s -C $(app) clean ;)
 	-rm -f rootfsimg/build/*
+	-rm -rf apps/busybox/repo
