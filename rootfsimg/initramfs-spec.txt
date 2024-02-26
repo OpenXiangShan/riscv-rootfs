@@ -40,6 +40,6 @@ file /spec_common/trap ${RISCV_ROOTFS_HOME}/rootfsimg/build/trap 755 0 0
 # SPEC
 dir /spec 755 0 0
 file /spec/run.sh ${RISCV_ROOTFS_HOME}/rootfsimg/run.sh 755 0 0
-file /spec/astar_base.riscv64-linux-gnu-gcc12.2.0 /nfs/home/jiaxiaoyu/simpoint/my-spec-top/spec06-rv64gcb-gcc12.2.0-o3/astar_base.rv64gcb-gcc12.2.0-o3 755 0 0
-file /spec/BigLakes2048.bin /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/astar/BigLakes2048.bin 755 0 0
-file /spec/BigLakes2048.cfg /nfs/home/share/xs-workloads/spec/spec-all/cpu2006_run_dir/astar/BigLakes2048.cfg 755 0 0
+file /spec/astar_base ${SPEC_BUILD_PATH}/astar 755 0 0
+file /spec/BigLakes2048.bin ${CPU2006_RUN_DIR}/astar/BigLakes2048.bin 755 0 0
+file /spec/BigLakes2048.cfg ${CPU2006_RUN_DIR}/astar/BigLakes2048.cfg 755 0 0
