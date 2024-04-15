@@ -3,7 +3,7 @@ NAME = zlib
 include $(RISCV_ROOTFS_HOME)/Makefile.app
 
 REPO_PATH = repo
-TARBALL = zlib-1.2.13.tar.gz
+TARBALL = zlib-1.3.1.tar.gz
 CONFIG_FLAGS = --prefix=$(shell realpath build)
 
 $(TARBALL):
