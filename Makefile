@@ -1,6 +1,7 @@
 $(shell mkdir -p rootfsimg/build)
 
-APPS = hello busybox before_workload trap qemu_trap
+APPS = hello busybox before_workload trap qemu_trap dtc lkvm-static
+
 APPS_DIR = $(addprefix apps/, $(APPS))
 
 .PHONY: rootfsimg $(APPS_DIR) clean

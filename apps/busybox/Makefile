@@ -4,7 +4,6 @@ include $(RISCV_ROOTFS_HOME)/Makefile.app
 
 REPO_PATH = repo
 $(REPO_PATH):
-	mkdir -p $@
 	git clone --depth 1 -b 1_32_stable https://github.com/mirror/busybox.git $@
 	cp config $@/.config
 
