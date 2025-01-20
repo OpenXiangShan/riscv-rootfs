@@ -1,0 +1,47 @@
+NAME ?= default
+REPO_PATH ?= repo_result
+DOWNLOAD_PATH ?= download_result
+DOWNLOAD_TARGET_FILE = $(DOWNLOAD_PATH)/$(NAME)
+CLONE_TARGET_REPO = $(REPO_PATH)/$(NAME)
+EXTRACT_DOWNLOAD_TARGET = $(DOWNLOAD_TARGET_FILE)_extract
+
+$(DOWNLOAD_PATH):
+	@mkdir -p $@
+
+$(REPO_PATH):
+	@mkdir -p $@
+
+$(DOWNLOAD_TARGET_FILE): $(DOWNLOAD_PATH)
+	@if [ -z "$(URL)" ]; then \
+		echo "Error: URL not specified."; \
+		exit 1; \
+	fi
+	curl -L "$(URL)" -o $(DOWNLOAD_TARGET_FILE)
+	@echo "Download: $(URL) to $(DOWNLOAD_TARGET_FILE)"
+
+$(CLONE_TARGET_REPO): $(REPO_PATH)
+	@if [ -z "$(REPO)" ]; then \
+		echo "Error: REPO not specified."; \
+		exit 1; \
+	fi
+	@git clone --depth 1 "$(REPO)" -o $(CLONE_TARGET_REPO)
+	@echo "Clone: $(REPO) to $(CLONE_TARGET_REPO)"
+
+$(EXTRACT_DOWNLOAD_TARGET): $(DOWNLOAD_TARGET_FILE)
+	@mkdir -p $@
+	@tar -xf "$(DOWNLOAD_TARGET_FILE)" --strip-components=1 -C $@
+	@echo "Unpacked: $(DOWNLOAD_TARGET_FILE)"
+
+.PHONY: clone
+clone: $(CLONE_TARGET_REPO)
+
+.PHONY: download
+download: $(DOWNLOAD_TARGET_FILE)
+
+.PHONY: unpack
+unpack: $(EXTRACT_DOWNLOAD_TARGET)
+
+.PHONY: clean-get
+clean-get:
+	@rm -rf $(DOWNLOAD_PATH)
+	@rm -rf $(REPO_PATH)
