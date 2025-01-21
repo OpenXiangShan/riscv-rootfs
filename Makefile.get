@@ -16,7 +16,7 @@ $(DOWNLOAD_TARGET_FILE): $(DOWNLOAD_PATH)
 		echo "Error: URL not specified."; \
 		exit 1; \
 	fi
-	curl -L "$(URL)" -o $(DOWNLOAD_TARGET_FILE)
+	@curl -L "$(URL)" -o $(DOWNLOAD_TARGET_FILE)
 	@echo "Download: $(URL) to $(DOWNLOAD_TARGET_FILE)"
 
 $(CLONE_TARGET_REPO): $(REPO_PATH)
@@ -24,7 +24,7 @@ $(CLONE_TARGET_REPO): $(REPO_PATH)
 		echo "Error: REPO not specified."; \
 		exit 1; \
 	fi
-	@git clone --depth 1 "$(REPO)" -o $(CLONE_TARGET_REPO)
+	@git clone --depth 1 "$(REPO)" "$(CLONE_TARGET_REPO)"
 	@echo "Clone: $(REPO) to $(CLONE_TARGET_REPO)"
 
 $(EXTRACT_DOWNLOAD_TARGET): $(DOWNLOAD_TARGET_FILE)
