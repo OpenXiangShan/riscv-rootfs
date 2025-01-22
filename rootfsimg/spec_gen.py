@@ -87,7 +87,7 @@ def traverse_path(path, stack=""):
       all_files.extend(sub_files)
   return (all_dirs, all_files)
 
-def generate_initramfs(specs):
+def generate_initramfs(initramfs_file, specs):
   lines = default_files.copy()
   for spec in specs:
     spec_files = get_spec_info()[spec][0]
@@ -110,11 +110,11 @@ def generate_initramfs(specs):
           lines.append(f"file /spec/{name}/{file} {path}/{file} 755 0 0")
       else:
         print(f"unknown filename: {filename}")
-  with open("initramfs-spec.txt", "w") as f:
+  with open(initramfs_file, "w") as f:
     f.writelines(map(lambda x: x + "\n", lines))
 
 
-def generate_run_sh(specs, withTrap=False):
+def generate_run_sh(run_sh, specs, withTrap=False):
   lines =[ ]
   lines.append("#!/bin/sh")
   lines.append("echo '===== Start running SPEC2006 ====='")
@@ -134,10 +134,10 @@ def generate_run_sh(specs, withTrap=False):
     lines.append("set +x")
     lines.append(f"echo '======== END   {spec} ========'")
   lines.append("echo '===== Finish running SPEC2006 ====='")
-  with open("run.sh", "w") as f:
+  with open(run_sh, "w") as f:
     f.writelines(map(lambda x: x + "\n", lines))
 
-def generate_build_scripts(specs, withTrap=False, spec_gen=__file__):
+def generate_build_scripts(build_sh, specs, withTrap=False, spec_gen=__file__):
   lines = []
   lines.append("#!/bin/sh")
   lines.append("set -x")
@@ -162,7 +162,7 @@ def generate_build_scripts(specs, withTrap=False, spec_gen=__file__):
       lines.append(f"riscv64-unknown-linux-gnu-objdump -d {f} > {target_dir}/{filename}.txt")
     for f in [bbl_elf, linux_elf, spec_elf, bbl_bin]:
       lines.append(f"cp {f} {target_dir}")
-  with open("build.sh", "w") as f:
+  with open(build_sh, "w") as f:
     f.writelines(map(lambda x: x + "\n", lines))
 
 if __name__ == "__main__":
@@ -175,11 +175,18 @@ if __name__ == "__main__":
                       help='checkpoints mode (with before_workload and trap)')
   parser.add_argument('--scripts', action='store_true',
                       help='generate build scripts for spec ramfs')
+  parser.add_argument('--initramfs-file', help="specify output initramfs file name")
+  parser.add_argument('--run-sh-file', help="specify output run.sh file name")
+  parser.add_argument('--build-sh-file', help="specify output build.sh file name")
 
   args = parser.parse_args()
 
   if args.elf_suffix is not None:
     elf_suffix = args.elf_suffix
+
+  initramfs_file_name = "initramfs-spec.txt" if args.initramfs_file is None else args.initramfs_file
+  run_sh_file_name = "run.sh" if args.run_sh_file is None else args.run_sh_file
+  build_sh_file_name = "build.sh" if args.build_sh_file is None else args.build_sh_file
 
   load_json(args.json)
   # parse benchspec
@@ -194,7 +201,7 @@ if __name__ == "__main__":
   print(f"All {len(benchspec)} selected benchspec: {' '.join(benchspec)}")
 
   if args.scripts:
-    generate_build_scripts(benchspec, args.checkpoints)
+    generate_build_scripts(build_sh_file_name, benchspec, args.checkpoints)
   else:
-    generate_initramfs(benchspec)
-    generate_run_sh(benchspec, args.checkpoints)
+    generate_initramfs(initramfs_file_name, benchspec)
+    generate_run_sh(run_sh_file_name, benchspec, args.checkpoints)
