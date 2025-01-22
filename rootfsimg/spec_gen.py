@@ -8,12 +8,15 @@ elf_suffix = "_base.riscv64-linux-gnu-gcc-9.3.0"
 # (filelist, arguments) information for each benchmark
 # filelist[0] should always be the binary file
 
-with open("./spec_json/spec06.json", "r") as f:
-    spec_data = json.load(f)
+json_data = {}
+def load_json(json_path):
+    with open(json_path, "r") as f:
+        global json_data
+        json_data = json.load(f)
 
 def get_spec_info():
     spec_info = {}
-    for spec_name, spec_details in spec_data.items():
+    for spec_name, spec_details in json_data.items():
         base_name = spec_details["base_name"]
         files = [
             f"${{SPEC}}/spec06_exe/{base_name}" + elf_suffix
@@ -165,6 +168,7 @@ def generate_build_scripts(specs, withTrap=False, spec_gen=__file__):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='CPU CPU2006 ramfs scripts')
   parser.add_argument('benchspec', nargs='*', help='selected benchmarks')
+  parser.add_argument('--json', required=True, help='select config json')
   parser.add_argument('--elf-suffix', '-s',
                       help='elf suffix (default: _base.riscv64-linux-gnu-gcc-9.3.0)')
   parser.add_argument('--checkpoints', action='store_true',
@@ -177,6 +181,7 @@ if __name__ == "__main__":
   if args.elf_suffix is not None:
     elf_suffix = args.elf_suffix
 
+  load_json(args.json)
   # parse benchspec
   benchspec = []
   spec_info = get_spec_info()
