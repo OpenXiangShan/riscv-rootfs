@@ -1,0 +1,812 @@
+{
+    "blender": {
+        "base_name": "blender",
+        "files": [
+            "blender/control",
+            "blender/sh3_no_char.blend"
+        ],
+        "args": [
+            "sh3_no_char.blend",
+            "--render-output",
+            "sh3_no_char_",
+            "--threads",
+            "1",
+            "-b",
+            "-F",
+            "RAWTGA",
+            "-s",
+            "849",
+            "-e",
+            "849",
+            "-a"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "bwaves_1": {
+        "base_name": "bwaves",
+        "files": [
+            "bwaves/bwaves_3.in",
+            "bwaves/bwaves_2.in",
+            "bwaves/control",
+            "bwaves/bwaves_1.in",
+            "bwaves/bwaves_4.in"
+        ],
+        "args": [
+            "bwaves_1",
+            "<",
+            "bwaves_1.in"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "bwaves_2": {
+        "base_name": "bwaves",
+        "files": [
+            "bwaves/bwaves_3.in",
+            "bwaves/bwaves_2.in",
+            "bwaves/control",
+            "bwaves/bwaves_1.in",
+            "bwaves/bwaves_4.in"
+        ],
+        "args": [
+            "bwaves_2",
+            "<",
+            "bwaves_2.in"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "bwaves_3": {
+        "base_name": "bwaves",
+        "files": [
+            "bwaves/bwaves_3.in",
+            "bwaves/bwaves_2.in",
+            "bwaves/control",
+            "bwaves/bwaves_1.in",
+            "bwaves/bwaves_4.in"
+        ],
+        "args": [
+            "bwaves_3",
+            "<",
+            "bwaves_3.in"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "bwaves_4": {
+        "base_name": "bwaves",
+        "files": [
+            "bwaves/bwaves_3.in",
+            "bwaves/bwaves_2.in",
+            "bwaves/control",
+            "bwaves/bwaves_1.in",
+            "bwaves/bwaves_4.in"
+        ],
+        "args": [
+            "bwaves_4",
+            "<",
+            "bwaves_4.in"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "cactuBSSN": {
+        "base_name": "cactuBSSN",
+        "files": [
+            "cactuBSSN/control",
+            "cactuBSSN/spec_ref.par"
+        ],
+        "args": [
+            "spec_ref.par"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "cam4": {
+        "base_name": "cam4",
+        "files": [
+            "cam4/bcphi_camrt_c080918.nc",
+            "cam4/sulfate_camrt_c080918.nc",
+            "cam4/dust4_camrt_c080918.nc",
+            "cam4/ssam_camrt_c080918.nc",
+            "cam4/ocpho_camrt_c080918.nc",
+            "cam4/aero_1.9x2.5_L26_2000clim_c091112.nc",
+            "cam4/bcpho_camrt_c080918.nc",
+            "cam4/cami_0000-01-01_1.9x2.5_L26_APE_c080203.nc",
+            "cam4/dust1_camrt_c080918.nc",
+            "cam4/ozone_1.9x2.5_L26_2000clim_c091112.nc",
+            "cam4/drv_flds_in",
+            "cam4/sscm_camrt_c080918.nc",
+            "cam4/atm_in",
+            "cam4/clim_p_trop.nc",
+            "cam4/drv_in",
+            "cam4/abs_ems_factors_fastvx.c030508.nc",
+            "cam4/dust2_camrt_c080918.nc",
+            "cam4/dust3_camrt_c080918.nc",
+            "cam4/USGS-gtopo30_1.9x2.5_remap_c050602.nc",
+            "cam4/ocphi_camrt_c080918.nc"
+        ],
+        "args": [],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "deepsjeng": {
+        "base_name": "deepsjeng",
+        "files": [
+            "deepsjeng/ref.txt"
+        ],
+        "args": [
+            "ref.txt"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "exchange2": {
+        "base_name": "exchange2",
+        "files": [
+            "exchange2/control",
+            "exchange2/puzzles.txt"
+        ],
+        "args": [
+            "6"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "fotonik3d": {
+        "base_name": "fotonik3d",
+        "files": [
+            "fotonik3d/yee.dat",
+            "fotonik3d/TEwaveguide.m",
+            "fotonik3d/OBJ.dat.gen.err",
+            "fotonik3d/power1.dat",
+            "fotonik3d/OBJ.dat.xz",
+            "fotonik3d/trans_W3PC.def",
+            "fotonik3d/PSI.dat",
+            "fotonik3d/power2.dat",
+            "fotonik3d/incident_W3PC.def",
+            "fotonik3d/OBJ.dat"
+        ],
+        "args": [],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "gcc_pp_O2": {
+        "base_name": "gcc",
+        "files": [
+            "gcc/ref32.c",
+            "gcc/control",
+            "gcc/gcc-pp.c",
+            "gcc/gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s",
+            "gcc/gcc-smaller.c"
+        ],
+        "args": [
+            "gcc-pp.c",
+            "-O2",
+            "-finline-limit=36000",
+            "-fpic",
+            "-o",
+            "gcc-pp.opts-O2_-finline-limit_36000_-fpic.s"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "gcc_pp_O3": {
+        "base_name": "gcc",
+        "files": [
+            "gcc/ref32.c",
+            "gcc/control",
+            "gcc/gcc-pp.c",
+            "gcc/gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s",
+            "gcc/gcc-smaller.c"
+        ],
+        "args": [
+            "gcc-pp.c",
+            "-O3",
+            "-finline-limit=0",
+            "-fif-conversion",
+            "-fif-conversion2",
+            "-o",
+            "gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "gcc_ref32_O3": {
+        "base_name": "gcc",
+        "files": [
+            "gcc/ref32.c",
+            "gcc/control",
+            "gcc/gcc-pp.c",
+            "gcc/gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s",
+            "gcc/gcc-smaller.c"
+        ],
+        "args": [
+            "ref32.c",
+            "-O3",
+            "-fselective-scheduling",
+            "-fselective-scheduling2",
+            "-o",
+            "ref32.opts-O3_-fselective-scheduling_-fselective-scheduling2.s"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "gcc_ref32_O5": {
+        "base_name": "gcc",
+        "files": [
+            "gcc/ref32.c",
+            "gcc/control",
+            "gcc/gcc-pp.c",
+            "gcc/gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s",
+            "gcc/gcc-smaller.c"
+        ],
+        "args": [
+            "ref32.c",
+            "-O5",
+            "-o",
+            "ref32.opts-O5.s"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "gcc_small_O3": {
+        "base_name": "gcc",
+        "files": [
+            "gcc/ref32.c",
+            "gcc/control",
+            "gcc/gcc-pp.c",
+            "gcc/gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s",
+            "gcc/gcc-smaller.c"
+        ],
+        "args": [
+            "gcc-smaller.c",
+            "-O3",
+            "-fipa-pta",
+            "-o",
+            "gcc-smaller.opts-O3_-fipa-pta.s"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "imagick": {
+        "base_name": "imagick",
+        "files": [
+            "imagick/control",
+            "imagick/refrate_input.tga"
+        ],
+        "args": [
+            "-limit",
+            "disk",
+            "0",
+            "refrate_input.tga",
+            "-edge",
+            "41",
+            "-resample",
+            "181%",
+            "-emboss",
+            "31",
+            "-colorspace",
+            "YUV",
+            "-mean-shift",
+            "19x19+15%",
+            "-resize",
+            "30%",
+            "refrate_output.tga"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "lbm": {
+        "base_name": "lbm",
+        "files": [
+            "lbm/100_100_130_ldc.of",
+            "lbm/lbm.in"
+        ],
+        "args": [
+            "3000",
+            "reference.dat",
+            "0",
+            "0",
+            "100_100_130_ldc.of"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "leela": {
+        "base_name": "leela",
+        "files": [
+            "leela/ref.sgf"
+        ],
+        "args": [
+            "ref.sgf"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "mcf": {
+        "base_name": "mcf",
+        "files": [
+            "mcf/control",
+            "mcf/inp.in"
+        ],
+        "args": [
+            "inp.in"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "nab": {
+        "base_name": "nab",
+        "files": [
+            "nab/control",
+            "dir 1am0 nab/1am0"
+        ],
+        "args": [
+            "1am0",
+            "1122214447",
+            "122"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "namd": {
+        "base_name": "namd",
+        "files": [
+            "namd/apoa1.ref.output",
+            "namd/namd.in",
+            "namd/apoa1.input"
+        ],
+        "args": [
+            "--input",
+            "apoa1.input",
+            "--output",
+            "apoa1.ref.output",
+            "--iterations",
+            "65"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "omnetpp": {
+        "base_name": "omnetpp",
+        "files": [
+            "omnetpp/control",
+            "omnetpp/omnetpp.ini",
+            "dir ned omnetpp/ned"
+        ],
+        "args": [
+            "-c",
+            "General",
+            "-r",
+            "0"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "parest": {
+        "base_name": "parest",
+        "files": [
+            "parest/ref.prm",
+            "parest/.ref.prm.swp"
+        ],
+        "args": [
+            "ref.prm"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "perlbench_diff": {
+        "base_name": "perlbench",
+        "files": [
+            "perlbench/splitmail.in",
+            "perlbench/checkspam.in",
+            "perlbench/diffmail.pl",
+            "perlbench/splitmail.pl",
+            "perlbench/checkspam.pl",
+            "perlbench/diffmail.in",
+            "perlbench/cpu2017_mhonarc.rc",
+            "dir lib perlbench/lib",
+            "dir rules perlbench/rules"
+        ],
+        "args": [
+            "-I./lib",
+            "diffmail.pl",
+            "4",
+            "800",
+            "10",
+            "17",
+            "19",
+            "300"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "perlbench_spam": {
+        "base_name": "perlbench",
+        "files": [
+            "perlbench/splitmail.in",
+            "perlbench/checkspam.in",
+            "perlbench/diffmail.pl",
+            "perlbench/splitmail.pl",
+            "perlbench/checkspam.pl",
+            "perlbench/diffmail.in",
+            "perlbench/cpu2017_mhonarc.rc",
+            "dir lib perlbench/lib",
+            "dir rules perlbench/rules"
+        ],
+        "args": [
+            "-I./lib",
+            "checkspam.pl",
+            "2500",
+            "5",
+            "25",
+            "11",
+            "150",
+            "1",
+            "1",
+            "1",
+            "1"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "perlbench_split": {
+        "base_name": "perlbench",
+        "files": [
+            "perlbench/splitmail.in",
+            "perlbench/checkspam.in",
+            "perlbench/diffmail.pl",
+            "perlbench/splitmail.pl",
+            "perlbench/checkspam.pl",
+            "perlbench/diffmail.in",
+            "perlbench/cpu2017_mhonarc.rc",
+            "dir lib perlbench/lib",
+            "dir rules perlbench/rules"
+         ],
+        "args": [
+            "-I./lib",
+            "splitmail.pl",
+            "6400",
+            "12",
+            "26",
+            "16",
+            "100",
+            "0"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "povray": {
+        "base_name": "povray",
+        "files": [
+            "povray/chars.inc",
+            "povray/golds.inc",
+            "povray/stones.inc",
+            "povray/logo.inc",
+            "povray/consts.inc",
+            "povray/SPEC-benchmark-ref.ini",
+            "povray/arrays.inc",
+            "povray/shapesq.inc",
+            "povray/stage1.inc",
+            "povray/woodmaps.inc",
+            "povray/stdcam.inc",
+            "povray/screen.inc",
+            "povray/glass.inc",
+            "povray/cyrvetic.ttf",
+            "povray/stones1.inc",
+            "povray/woods.inc",
+            "povray/stoneold.inc",
+            "povray/stones2.inc",
+            "povray/povlogo.ttf",
+            "povray/stdinc.inc",
+            "povray/skies.inc",
+            "povray/shapes_old.inc",
+            "povray/crystal.ttf",
+            "povray/rand.inc",
+            "povray/textures.inc",
+            "povray/sunpos.inc",
+            "povray/stars.inc",
+            "povray/rad_def.inc",
+            "povray/colors.inc",
+            "povray/shapes.inc",
+            "povray/finish.inc",
+            "povray/strings.inc",
+            "povray/timrom.ttf",
+            "povray/metals.inc",
+            "povray/shapes2.inc",
+            "povray/debug.inc",
+            "povray/transforms.inc",
+            "povray/math.inc",
+            "povray/functions.inc",
+            "povray/glass_old.inc",
+            "povray/SPEC-benchmark-ref.pov"
+        ],
+        "args": [
+            "SPEC-benchmark-ref.ini"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "roms": {
+        "base_name": "roms",
+        "files": [
+            "roms/ocean_benchmark2.in.x",
+            "roms/varinfo.dat"
+        ],
+        "args": [
+            "<",
+            "ocean_benchmark2.in.x"
+        ],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "wrf": {
+        "base_name": "wrf",
+        "files": [
+            "wrf/ozone_plev.formatted",
+            "wrf/ozone.formatted",
+            "wrf/RRTMG_SW_DATA",
+            "wrf/wrfsfdda_d01",
+            "wrf/grib2map.tbl",
+            "wrf/VEGPARM.TBL",
+            "wrf/control",
+            "wrf/OBS_DOMAIN201",
+            "wrf/VEGPARM.TBLa",
+            "wrf/RRTMG_LW_DATA",
+            "wrf/namelist.input",
+            "wrf/ETAMPNEW_DATA",
+            "wrf/wrfbdy_d01",
+            "wrf/tr49t85",
+            "wrf/tr49t67",
+            "wrf/ozone_lat.formatted",
+            "wrf/gribmap.txt",
+            "wrf/OBS_DOMAIN101",
+            "wrf/wrfinput_d01",
+            "wrf/LANDUSE.TBL",
+            "wrf/RRTM_DATA",
+            "wrf/co2_trans",
+            "wrf/tr67t85",
+            "wrf/CAM_AEROPT_DATA",
+            "wrf/CAM_ABS_DATA",
+            "wrf/SOILPARM.TBL",
+            "wrf/GENPARM.TBL",
+            "wrf/URBPARM.TBL"
+        ],
+        "args": [],
+        "type": [
+            "fp",
+            "ref"
+        ]
+    },
+    "x264_pass1": {
+        "base_name": "x264",
+        "files": [
+            "x264/control",
+            "x264/BuckBunny.264",
+            "x264/dataDec.txt",
+            "x264/BuckBunny.yuv",
+            "x264/log.dec",
+            "x264/BuckBunny_New.264"
+        ],
+        "args": [
+            "--pass",
+            "1",
+            "--stats",
+            "x264_stats.log",
+            "--bitrate",
+            "1000",
+            "--frames",
+            "1000",
+            "-o",
+            "BuckBunny_New.264",
+            "BuckBunny.yuv",
+            "1280x720"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "x264_pass2": {
+        "base_name": "x264",
+        "files": [
+            "x264/control",
+            "x264/BuckBunny.264",
+            "x264/dataDec.txt",
+            "x264/BuckBunny.yuv",
+            "x264/log.dec",
+            "x264/BuckBunny_New.264",
+            "x264_pass2/x264_stats.log",
+            "x264_pass2/BuckBunny_New.264",
+            "x264_pass2/x264_stats.log.mbtree"
+        ],
+        "args": [
+            "--pass",
+            "2",
+            "--stats",
+            "x264_stats.log",
+            "--bitrate",
+            "1000",
+            "--dumpyuv",
+            "200",
+            "--frames",
+            "1000",
+            "-o",
+            "BuckBunny_New.264",
+            "BuckBunny.yuv",
+            "1280x720"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "x264_seek": {
+        "base_name": "x264",
+        "files": [
+            "x264_seek/frame_200.yuv",
+            "x264_seek/frame_999.yuv",
+            "x264_seek/BuckBunny_New.264",
+            "x264_seek/frame_0.yuv",
+            "x264_seek/frame_400.yuv",
+            "x264_seek/frame_600.yuv",
+            "x264_seek/x264_stats.log.mbtree",
+            "x264_seek/frame_800.yuv",
+            "x264/BuckBunny.yuv"
+        ],
+        "args": [
+            "--seek",
+            "500",
+            "--dumpyuv",
+            "200",
+            "--frames",
+            "1250",
+            "-o",
+            "BuckBunny_New.264",
+            "BuckBunny.yuv",
+            "1280x720"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "xalancbmk": {
+        "base_name": "xalancbmk",
+        "files": [
+            "xalancbmk/ref.lst",
+            "xalancbmk/100mb.xsd",
+            "xalancbmk/xalanc.xsl",
+            "xalancbmk/t5.xml"
+        ],
+        "args": [
+            "-v",
+            "t5.xml xalanc.xsl"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "xz_cld": {
+        "base_name": "xz",
+        "files": [
+            "xz/control",
+            "xz/input.combined.xz",
+            "xz/cld.tar.xz",
+            "xz/cpu2006docs.tar.xz"
+        ],
+        "args": [
+            "cld.tar.xz",
+            "160",
+            "19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474",
+            "59796407",
+            "61004416",
+            "6"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "xz_combined": {
+        "base_name": "xz",
+        "files": [
+            "xz/control",
+            "xz/input.combined.xz",
+            "xz/cld.tar.xz",
+            "xz/cpu2006docs.tar.xz"
+        ],
+        "args": [
+            "input.combined.xz",
+            "250",
+            "a841f68f38572a49d86226b7ff5baeb31bd19dc637a922a972b2e6d1257a890f6a544ecab967c313e370478c74f760eb229d4eef8a8d2836d233d3e9dd1430bf",
+            "40401484",
+            "41217675",
+            "7"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    },
+    "xz_cpu2006": {
+        "base_name": "xz",
+        "files": [
+            "xz/control",
+            "xz/input.combined.xz",
+            "xz/cld.tar.xz",
+            "xz/cpu2006docs.tar.xz"
+        ],
+        "args": [
+            "cpu2006docs.tar.xz",
+            "250",
+            "055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae",
+            "23047774",
+            "23513385",
+            "6e"
+        ],
+        "type": [
+            "int",
+            "ref"
+        ]
+    }
+}
