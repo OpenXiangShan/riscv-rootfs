@@ -362,8 +362,8 @@
         "base_name": "gobmk",
         "files": [
             "gobmk/13x13.tst",
-            "dir games /gobmk/games",
-            "dir golois /gobmk/golois"
+            "dir games gobmk/games",
+            "dir golois gobmk/golois"
         ],
         "args": [
             "--quiet",
@@ -381,8 +381,8 @@
         "base_name": "gobmk",
         "files": [
             "gobmk/nngs.tst",
-            "dir games /gobmk/games",
-            "dir golois /gobmk/golois"
+            "dir games gobmk/games",
+            "dir golois gobmk/golois"
         ],
         "args": [
             "--quiet",
@@ -400,8 +400,8 @@
         "base_name": "gobmk",
         "files": [
             "gobmk/score2.tst",
-            "dir games /gobmk/games",
-            "dir golois /gobmk/golois"
+            "dir games gobmk/games",
+            "dir golois gobmk/golois"
         ],
         "args": [
             "--quiet",
@@ -419,8 +419,8 @@
         "base_name": "gobmk",
         "files": [
             "gobmk/trevorc.tst",
-            "dir games /gobmk/games",
-            "dir golois /gobmk/golois"
+            "dir games gobmk/games",
+            "dir golois gobmk/golois"
         ],
         "args": [
             "--quiet",
@@ -438,8 +438,8 @@
         "base_name": "gobmk",
         "files": [
             "gobmk/trevord.tst",
-            "dir games /gobmk/games",
-            "dir golois /gobmk/golois"
+            "dir games gobmk/games",
+            "dir golois gobmk/golois"
         ],
         "args": [
             "--quiet",
@@ -661,8 +661,8 @@
             "perlbench/cpu2006_mhonarc.rc",
             "perlbench/checkspam.pl",
             "perlbench/checkspam.in",
-            "dir lib /perlbench/lib",
-            "dir rules /perlbench/rules"
+            "dir lib perlbench/lib",
+            "dir rules perlbench/rules"
         ],
         "args": [
             "-I./lib",
@@ -688,8 +688,8 @@
             "perlbench/cpu2006_mhonarc.rc",
             "perlbench/diffmail.pl",
             "perlbench/diffmail.in",
-            "dir lib /perlbench/lib",
-            "dir rules /perlbench/rules"
+            "dir lib perlbench/lib",
+            "dir rules perlbench/rules"
         ],
         "args": [
             "-I./lib",
@@ -712,8 +712,8 @@
             "perlbench/cpu2006_mhonarc.rc",
             "perlbench/splitmail.pl",
             "perlbench/splitmail.in",
-            "dir lib /perlbench/lib",
-            "dir rules /perlbench/rules"
+            "dir lib perlbench/lib",
+            "dir rules perlbench/rules"
         ],
         "args": [
             "-I./lib",
@@ -732,7 +732,7 @@
     "povray": {
         "base_name": "povray",
         "files": [
-            "dir . /povray"
+            "dir . povray"
         ],
         "args": [
             "SPEC-benchmark-ref.ini"
@@ -788,7 +788,7 @@
     "sphinx3": {
         "base_name": "sphinx3",
         "files": [
-            "dir . /sphinx3"
+            "dir . sphinx3"
         ],
         "args": [
             "ctlfile",
@@ -814,7 +814,7 @@
     "wrf": {
         "base_name": "wrf",
         "files": [
-            "dir . /wrf"
+            "dir . wrf"
         ],
         "args": [],
         "type": [
@@ -825,7 +825,7 @@
     "xalancbmk": {
         "base_name": "xalancbmk",
         "files": [
-            "dir . /xalancbmk"
+            "dir . xalancbmk"
         ],
         "args": [
             "-v",

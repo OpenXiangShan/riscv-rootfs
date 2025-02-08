@@ -11,6 +11,8 @@ elf_suffix = "_base.riscv64-linux-gnu-gcc-9.3.0"
 
 json_data = {}
 default_initramfs_data = []
+global elf_root_path
+global files_root_path
 
 def load_json(json_path):
     with open(json_path, "r") as f:
@@ -26,11 +28,13 @@ def get_spec_info():
     spec_info = {}
     for spec_name, spec_details in json_data.items():
         base_name = spec_details["base_name"]
-        files = [
-            f"${{SPEC}}/spec06_exe/{base_name}" + elf_suffix
-        ] + [
-            f"${{SPEC}}/cpu2006_run_dir/{file}" for file in spec_details["files"]
-        ]
+        files = [os.path.join(elf_root_path, base_name)]
+        for file in spec_details["files"]:
+            if len(file.split()) == 3:
+                node_type, name, path = file.split()
+                files = files + [f"{node_type} {name} {os.path.join(files_root_path, path)}"]
+            else:
+                files = files + [os.path.join(files_root_path, file)]
         args = spec_details["args"]
         spec_type = spec_details["type"]
         spec_info[spec_name] = (files, args, spec_type)
@@ -55,17 +59,19 @@ def generate_initramfs(initramfs_file, specs):
   for spec in specs:
     spec_files = get_spec_info()[spec][0]
     for i, filename in enumerate(spec_files):
-      if len(filename.split()) == 1:
+      if len(filename.split()) == 1: # GemsFDTD/ref.in -> file /spec/ref.in GemsFDTD/ref.in 755 0 0
         # print(f"default {filename} to file 755 0 0")
         basename = filename.split("/")[-1]
         filename = f"file /spec/{basename} {filename} 755 0 0"
+        print("filename: " + filename)
         lines.append(filename)
-      elif len(filename.split()) == 3:
+      elif len(filename.split()) == 3: # dir games /gobmk/games -> dir /spec/games
         node_type, name, path = filename.split()
         if node_type != "dir":
           print(f"unknown filename: {filename}")
           continue
-        all_dirs, all_files = traverse_path(path)
+        all_dirs, all_files = traverse_path(os.path.expandvars(path))
+        print("dir " + os.path.join(path))
         lines.append(f"dir /spec/{name} 755 0 0")
         for sub_dir in all_dirs:
           lines.append(f"dir /spec/{name}/{sub_dir} 755 0 0")
@@ -75,7 +81,6 @@ def generate_initramfs(initramfs_file, specs):
         print(f"unknown filename: {filename}")
   with open(initramfs_file, "w") as f:
     f.writelines(map(lambda x: x + "\n", lines))
-
 
 def generate_run_sh(run_sh, specs, withTrap=False):
   lines =[ ]
@@ -141,6 +146,8 @@ if __name__ == "__main__":
   parser.add_argument('--initramfs-file', help="specify output initramfs file name")
   parser.add_argument('--run-sh-file', help="specify output run.sh file name")
   parser.add_argument('--build-sh-file', help="specify output build.sh file name")
+  parser.add_argument('--elfs', help="specify elf file root path")
+  parser.add_argument('--files', help="specify files root path")
 
   args = parser.parse_args()
 
@@ -150,6 +157,9 @@ if __name__ == "__main__":
   initramfs_file_name = "initramfs-spec.txt" if args.initramfs_file is None else args.initramfs_file
   run_sh_file_name = "run.sh" if args.run_sh_file is None else args.run_sh_file
   build_sh_file_name = "build.sh" if args.build_sh_file is None else args.build_sh_file
+
+  elf_root_path = "${SPEC}" if args.elfs is None else args.elfs
+  files_root_path = "${CPU2006RUN_DIR}" if args.files is None else args.files
 
   load_json(args.json)
   load_yaml("initramfs_yaml/default_files.yaml")
