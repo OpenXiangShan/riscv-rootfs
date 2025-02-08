@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 import json
+import yaml
 
 elf_suffix = "_base.riscv64-linux-gnu-gcc-9.3.0"
 
@@ -9,10 +10,17 @@ elf_suffix = "_base.riscv64-linux-gnu-gcc-9.3.0"
 # filelist[0] should always be the binary file
 
 json_data = {}
+default_initramfs_data = []
+
 def load_json(json_path):
     with open(json_path, "r") as f:
         global json_data
         json_data = json.load(f)
+
+def load_yaml(yaml_path):
+    with open(yaml_path, "r") as f:
+        global default_initramfs_data
+        default_initramfs_data = yaml.safe_load(f)["default_files"]
 
 def get_spec_info():
     spec_info = {}
@@ -27,51 +35,6 @@ def get_spec_info():
         spec_type = spec_details["type"]
         spec_info[spec_name] = (files, args, spec_type)
     return spec_info
-
-default_files = [
-  "dir /bin 755 0 0",
-  "dir /etc 755 0 0",
-  "dir /dev 755 0 0",
-  "dir /lib 755 0 0",
-  "dir /proc 755 0 0",
-  "dir /sbin 755 0 0",
-  "dir /sys 755 0 0",
-  "dir /tmp 755 0 0",
-  "dir /usr 755 0 0",
-  "dir /mnt 755 0 0",
-  "dir /usr/bin 755 0 0",
-  "dir /usr/lib 755 0 0",
-  "dir /usr/sbin 755 0 0",
-  "dir /var 755 0 0",
-  "dir /var/tmp 755 0 0",
-  "dir /root 755 0 0",
-  "dir /var/log 755 0 0",
-  "",
-  "nod /dev/console 644 0 0 c 5 1",
-  "nod /dev/null 644 0 0 c 1 3",
-  "",
-  "# libraries",
-  "file /lib/ld-linux-riscv64-lp64d.so.1 ${RISCV}/sysroot/lib/ld-linux-riscv64-lp64d.so.1 755 0 0",
-  "file /lib/libc.so.6 ${RISCV}/sysroot/lib/libc.so.6 755 0 0",
-  "file /lib/libresolv.so.2 ${RISCV}/sysroot/lib/libresolv.so.2 755 0 0",
-  "file /lib/libm.so.6 ${RISCV}/sysroot/lib/libm.so.6 755 0 0",
-  "file /lib/libdl.so.2 ${RISCV}/sysroot/lib/libdl.so.2 755 0 0",
-  "file /lib/libpthread.so.0 ${RISCV}/sysroot/lib/libpthread.so.0 755 0 0",
-  "",
-  "# busybox",
-  "file /bin/busybox ${RISCV_ROOTFS_HOME}/rootfsimg/build/busybox 755 0 0",
-  "file /etc/inittab ${RISCV_ROOTFS_HOME}/rootfsimg/inittab-spec 755 0 0",
-  "slink /init /bin/busybox 755 0 0",
-  "",
-  "# SPEC common",
-  "dir /spec_common 755 0 0",
-  "file /spec_common/before_workload ${SPEC}/before_workload 755 0 0",
-  "file /spec_common/trap ${SPEC}/trap_new 755 0 0",
-  "",
-  "# SPEC",
-  "dir /spec 755 0 0",
-  "file /spec/run.sh ${RISCV_ROOTFS_HOME}/rootfsimg/run.sh 755 0 0"
-]
 
 def traverse_path(path, stack=""):
   all_dirs, all_files = [], []
@@ -88,7 +51,7 @@ def traverse_path(path, stack=""):
   return (all_dirs, all_files)
 
 def generate_initramfs(initramfs_file, specs):
-  lines = default_files.copy()
+  lines = default_initramfs_data.copy()
   for spec in specs:
     spec_files = get_spec_info()[spec][0]
     for i, filename in enumerate(spec_files):
@@ -189,6 +152,8 @@ if __name__ == "__main__":
   build_sh_file_name = "build.sh" if args.build_sh_file is None else args.build_sh_file
 
   load_json(args.json)
+  load_yaml("initramfs_yaml/default_files.yaml")
+
   # parse benchspec
   benchspec = []
   spec_info = get_spec_info()
