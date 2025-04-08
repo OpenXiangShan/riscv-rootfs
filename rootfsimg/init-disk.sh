@@ -22,7 +22,7 @@ mount -t tmpfs -o size=6G tmpfs /ram_root
 
 echo "Move disk fs into memory"
 mount /dev/vda /mnt 
-cp /mnt/* /ram_root/
+cp -r /mnt/* /ram_root/
 umount /mnt
 
 echo "Chroot into disk fs in memory"
