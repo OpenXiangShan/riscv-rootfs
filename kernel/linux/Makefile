@@ -27,7 +27,7 @@ set_initramfs:
 	sed -i '/^CONFIG_INITRAMFS_SOURCE=/c CONFIG_INITRAMFS_SOURCE="$(INITRAMFS_TXT)"' $(BUILD)/.config
 
 .PHONY: install_defconfig
-install_defconfig:
+install_defconfig: | $(KERNEL_HOME)
 	@cp $(DEFCONFIG) $(KERNEL_HOME)/arch/$(ARCH)/configs/
 
 $(HOST_CONFIG):

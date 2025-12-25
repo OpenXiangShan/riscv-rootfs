@@ -11,7 +11,7 @@ $(DOWNLOAD_PATH):
 $(REPO_PATH):
 	@mkdir -p $@
 
-$(DOWNLOAD_TARGET_FILE): $(DOWNLOAD_PATH)
+$(DOWNLOAD_TARGET_FILE): | $(DOWNLOAD_PATH)
 	@if [ -z "$(URL)" ]; then \
 		echo "Error: URL not specified."; \
 		exit 1; \
