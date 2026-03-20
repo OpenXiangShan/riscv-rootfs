@@ -1,6 +1,6 @@
 $(shell mkdir -p rootfsimg/build)
 
-APPS = hello busybox before_workload trap qemu_trap dtc lkvm-static
+APPS = hello_xsai after_workload busybox before_workload trap qemu_trap dtc lkvm-static
 
 APPS_DIR = $(addprefix apps/, $(APPS))
 
