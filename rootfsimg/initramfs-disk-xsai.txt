@@ -30,6 +30,7 @@ file /lib/libpthread.so.0 ${RISCV}/sysroot/lib/libpthread.so.0 755 0 0
 # busybox + xsai hello + xsai init
 file /bin/busybox ${RISCV_ROOTFS_HOME}/rootfsimg/build/busybox 755 0 0
 file /bin/before_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/before_workload 755 0 0
+file /bin/gemm_precomp ${RISCV_ROOTFS_HOME}/rootfsimg/build/gemm_precomp 755 0 0
 file /bin/hello_xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/hello_xsai 755 0 0
 file /bin/after_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/after_workload 755 0 0
 file /etc/init ${RISCV_ROOTFS_HOME}/rootfsimg/init-disk-xsai.sh 755 0 0

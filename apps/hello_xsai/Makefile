@@ -33,8 +33,8 @@ CFLAGS += -DRESERVED_MEMORY_SIZE=$(RESERVED_MEMORY_SIZE)
 LDFLAGS += $(AME_TARGET) $(AME_ARCH) $(AME_FEATURE)
 
 include $(RISCV_ROOTFS_HOME)/Makefile.compile
-AME_OBJ ?= $(DST_DIR)/auto_test.o
-AME_DISASM ?= $(DST_DIR)/auto_test.S
+AME_OBJ ?= $(DST_DIR)/ggml_ame_gemm_tile_i8_i32_bT.o
+AME_DISASM ?= $(DST_DIR)/ggml_ame_gemm_tile_i8_i32_bT.S
 STATIC_DEBUG_CFLAGS ?= -O0 -g3 -fno-omit-frame-pointer -fno-inline -fno-inline-functions
 STATIC_DEBUG_LDFLAGS ?= -static
 

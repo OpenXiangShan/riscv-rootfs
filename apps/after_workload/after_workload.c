@@ -18,6 +18,7 @@ int main(int argc, char *argv[]){
     if (argc>1) {
         ret = atoi(argv[1]);
     }
+    nemu_signal(NOTIFY_PROFILE_EXIT);
     nemu_signal(ret);
 }
 

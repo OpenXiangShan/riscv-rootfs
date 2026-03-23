@@ -10,8 +10,10 @@ mount -t devtmpfs devtmpfs /dev
 
 hello_status=0
 
-/bin/before_workload
+# /bin/before_workload
 echo "[xsai-init] launching hello_xsai"
+/bin/gemm_precomp
+/bin/after_workload
 if [ -x /bin/hello_xsai ]; then
   if /bin/hello_xsai; then
     hello_status=0
