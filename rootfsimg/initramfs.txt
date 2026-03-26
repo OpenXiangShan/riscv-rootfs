@@ -1,31 +1,3 @@
-dir /bin 755 0 0
-dir /etc 755 0 0
-dir /dev 755 0 0
-dir /lib 755 0 0
-dir /proc 755 0 0
-dir /sbin 755 0 0
-dir /sys 755 0 0
-dir /tmp 755 0 0
-dir /usr 755 0 0
-dir /mnt 755 0 0
-dir /usr/bin 755 0 0
-dir /usr/lib 755 0 0
-dir /usr/sbin 755 0 0
-dir /var 755 0 0
-dir /var/tmp 755 0 0
-dir /root 755 0 0
-dir /var/log 755 0 0
-
-nod /dev/console 644 0 0 c 5 1
-nod /dev/null 644 0 0 c 1 3
-
-file /lib/ld-linux-riscv64-lp64d.so.1 ${RISCV}/sysroot/lib/ld-linux-riscv64-lp64d.so.1 755 0 0
-file /lib/libc.so.6 ${RISCV}/sysroot/lib/libc.so.6 755 0 0
-file /lib/libresolv.so.2 ${RISCV}/sysroot/lib/libresolv.so.2 755 0 0
-file /lib/libm.so.6 ${RISCV}/sysroot/lib/libm.so.6 755 0 0
-file /lib/libdl.so.2 ${RISCV}/sysroot/lib/libdl.so.2 755 0 0
-file /lib/libpthread.so.0 ${RISCV}/sysroot/lib/libpthread.so.0 755 0 0
-
 file /bin/busybox ${RISCV_ROOTFS_HOME}/rootfsimg/build/busybox 755 0 0
 file /etc/inittab ${RISCV_ROOTFS_HOME}/rootfsimg/inittab 755 0 0
 file /etc/passwd ${RISCV_ROOTFS_HOME}/rootfsimg/etc/passwd 755 0 0
@@ -82,9 +54,9 @@ dir /etc/dropbear 755 0 0
 file /bin/ssh-dropbear ${RISCV_ROOTFS_HOME}/rootfsimg/build/ssh-dropbear 755 0 0
 slink /bin/ssh /bin/ssh-dropbear 755 0 0
 #dropbear ssh dependencies
-file /lib/libcrypt.so.1 ${RISCV}/sysroot/lib/libcrypt.so.1 755 0 0
-file /lib/libnss_files.so.2 ${RISCV}/sysroot/lib/libnss_files.so.2 755 0 0
-file /lib/libutil.so.1 ${RISCV}/sysroot/lib/libutil.so.1 755 0 0
+file /lib/libcrypt.so.1 ${RISCV_LIBCRYPT_SO} 755 0 0
+file /lib/libnss_files.so.2 ${RISCV_LIBNSS_FILES_SO} 755 0 0
+file /lib/libutil.so.1 ${RISCV_LIBUTIL_SO} 755 0 0
 file /var/log/lastlog /dev/null 755 0 0
 
 #zlib
@@ -94,4 +66,4 @@ slink /lib/libz.so.1 /lib/libz.so.1.2.11 755 0 0
 
 #strace
 file /bin/strace ${RISCV_ROOTFS_HOME}/rootfsimg/build/strace 755 0 0
-file /lib/librt.so.1 ${RISCV}/sysroot/lib/librt.so.1 755 0 0
+file /lib/librt.so.1 ${RISCV_LIBRT_SO} 755 0 0

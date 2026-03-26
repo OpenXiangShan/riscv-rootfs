@@ -1,0 +1,7 @@
+# libraries
+file /lib/ld-linux-riscv64-lp64d.so.1 ${RISCV_LD_SO} 755 0 0
+file /lib/libc.so.6 ${RISCV_LIBC_SO} 755 0 0
+file /lib/libresolv.so.2 ${RISCV_LIBRESOLV_SO} 755 0 0
+file /lib/libm.so.6 ${RISCV_LIBM_SO} 755 0 0
+file /lib/libdl.so.2 ${RISCV_LIBDL_SO} 755 0 0
+file /lib/libpthread.so.0 ${RISCV_LIBPTHREAD_SO} 755 0 0
