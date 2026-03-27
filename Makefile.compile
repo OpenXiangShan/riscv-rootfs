@@ -1,7 +1,5 @@
 include $(RISCV_ROOTFS_HOME)/Makefile.app
 
-# Compilation flags
-
 CROSS_COMPILE ?= riscv64-unknown-linux-gnu-
 
 AS = $(CROSS_COMPILE)gcc
@@ -13,24 +11,23 @@ INCLUDES  = $(addprefix -I, $(INC_DIR))
 
 CFLAGS   += -O2 -MMD $(INCLUDES)
 CXXFLAGS += -O2 -MMD $(INCLUDES)
+LDFLAGS  += $(ROOTFS_LINKER_FLAGS)
 
-# Files to be compiled
 OBJS = $(addprefix $(DST_DIR)/, $(addsuffix .o, $(basename $(SRCS))))
 
-# Compilation patterns
 $(DST_DIR)/%.o: %.cpp
 	@echo + CXX $<
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
+
 $(DST_DIR)/%.o: %.c
 	@echo + CC $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
-$(APP): $(OBJS)
+$(APP): $(ROOTFS_LINK_FLAGS_STAMP) $(OBJS)
 	@echo + LD $@
 	@$(LD) $(LDFLAGS) -o $(APP) $(OBJS)
 
-# Dependencies
 DEPS = $(addprefix $(DST_DIR)/, $(addsuffix .d, $(basename $(SRCS))))
 -include $(DEPS)

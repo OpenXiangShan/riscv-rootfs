@@ -5,3 +5,4 @@ file /lib/libresolv.so.2 ${RISCV_LIBRESOLV_SO} 755 0 0
 file /lib/libm.so.6 ${RISCV_LIBM_SO} 755 0 0
 file /lib/libdl.so.2 ${RISCV_LIBDL_SO} 755 0 0
 file /lib/libpthread.so.0 ${RISCV_LIBPTHREAD_SO} 755 0 0
+file /lib/libatomic.so.1 ${RISCV_LIBATOMIC_SO} 755 0 0

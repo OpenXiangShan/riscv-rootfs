@@ -7,7 +7,7 @@ $(REPO_PATH):
 	git clone --depth 1 -b 1_32_stable https://github.com/mirror/busybox.git $@
 	cp config $@/.config
 
-$(APP): | $(REPO_PATH)
-	$(MAKE) -C $(REPO_PATH)
+$(APP): $(ROOTFS_LINK_FLAGS_STAMP) | $(REPO_PATH)
+	$(MAKE) -C $(REPO_PATH) clean
+	$(MAKE) -C $(REPO_PATH) EXTRA_LDFLAGS="$(ROOTFS_LINKER_FLAGS)"
 	ln -sf $(abspath $(REPO_PATH)/busybox) $@
-

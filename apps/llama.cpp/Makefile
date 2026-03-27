@@ -1,0 +1,301 @@
+NAME = llama-simple
+
+THIS_MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
+APP_DIR := $(patsubst %/,%,$(dir $(THIS_MAKEFILE)))
+XSAI_ENV_ROOT := $(abspath $(APP_DIR)/../../../..)
+
+XS_PROJECT_ROOT ?= $(XSAI_ENV_ROOT)
+RISCV_ROOTFS_HOME ?= $(XS_PROJECT_ROOT)/firmware/riscv-rootfs
+ROOTFS_BUILD_DIR ?= $(RISCV_ROOTFS_HOME)/rootfsimg/build
+ROOTFS_INTERPRETER ?= /lib/ld-linux-riscv64-lp64d.so.1
+RISCV ?= /opt/riscv
+export PATH := $(RISCV)/bin:$(PATH)
+
+REPO_PATH := $(APP_DIR)/repo
+LLAMA_CPP_DEFAULT_HOME := $(XS_PROJECT_ROOT)/software/llama.cpp
+ifneq ($(wildcard $(LLAMA_CPP_DEFAULT_HOME)/CMakeLists.txt),)
+LLAMA_CPP_HOME ?= $(LLAMA_CPP_DEFAULT_HOME)
+else
+LLAMA_CPP_HOME ?= $(REPO_PATH)
+endif
+
+CMAKE ?= cmake
+NPROC ?= $(shell nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 8)
+QEMU_HOME ?= $(XS_PROJECT_ROOT)/qemu
+QEMU_USER_CPU_FLAGS ?= rv64,v=true,vlen=128,h=true,zvfh=true,zvfhmin=true,x-matrix=true,rlen=512,mlen=65536,melen=32
+
+HOST_BUILD_DIR := $(APP_DIR)/build-host
+TARGET_BUILD_DIR := $(APP_DIR)/build-riscv
+HOST_TOOLS_STAMP := $(HOST_BUILD_DIR)/.tools-built
+TARGET_SIMPLE_BIN := $(TARGET_BUILD_DIR)/bin/llama-simple
+ROOTFS_SIMPLE_BIN := $(ROOTFS_BUILD_DIR)/llama-simple
+ROOTFS_WRAPPER := $(ROOTFS_BUILD_DIR)/llama-xsai
+ROOTFS_WRAPPER_SRC := $(APP_DIR)/llama-xsai.sh
+ROOTFS_MODEL_NAME ?= llama-model.gguf
+ROOTFS_MODEL_FILE := $(ROOTFS_BUILD_DIR)/$(ROOTFS_MODEL_NAME)
+
+MODELS_DIR ?= $(APP_DIR)/models
+MODEL_PRESET ?= stories15M
+STORIES15M_URL ?= https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+STORIES110M_URL ?= https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin
+
+ifeq ($(MODEL_PRESET),stories15M)
+MODEL_KIND ?= llama2c
+MODEL_NAME ?= stories15M
+MODEL_SOURCE_URL ?= $(STORIES15M_URL)
+endif
+ifeq ($(MODEL_PRESET),stories110M)
+MODEL_KIND ?= llama2c
+MODEL_NAME ?= stories110M
+MODEL_SOURCE_URL ?= $(STORIES110M_URL)
+endif
+
+MODEL_KIND ?= gguf
+MODEL_NAME ?= custom-model
+MODEL_SOURCE_URL ?=
+MODEL_SOURCE_PATH ?=
+QUANT_TYPE ?= q8_0
+MODEL_QUANTIZE ?= 1
+VOCAB_MODEL ?= $(LLAMA_CPP_HOME)/models/ggml-vocab-llama-spm.gguf
+
+SUPPORTED_MODEL_KINDS := llama2c gguf
+ifneq ($(filter $(MODEL_KIND),$(SUPPORTED_MODEL_KINDS)),$(MODEL_KIND))
+$(error MODEL_KIND must be one of $(SUPPORTED_MODEL_KINDS))
+endif
+
+MODEL_DIR := $(MODELS_DIR)/$(MODEL_NAME)
+MODEL_SOURCE_EXT := $(if $(filter llama2c,$(MODEL_KIND)),bin,gguf)
+MODEL_SOURCE_BASENAME := $(strip $(if $(MODEL_SOURCE_PATH),$(notdir $(MODEL_SOURCE_PATH)),$(notdir $(MODEL_SOURCE_URL))))
+MODEL_SOURCE_FILE := $(MODEL_DIR)/$(if $(MODEL_SOURCE_BASENAME),$(MODEL_SOURCE_BASENAME),$(MODEL_NAME).$(MODEL_SOURCE_EXT))
+MODEL_GGUF := $(MODEL_DIR)/$(MODEL_NAME).gguf
+MODEL_QUANTIZE_ENABLED := $(if $(filter 1 true TRUE yes YES,$(MODEL_QUANTIZE)),1,)
+MODEL_FINAL_FILE := $(MODEL_DIR)/$(MODEL_NAME)-$(QUANT_TYPE).gguf
+MODEL_READY_FILE := $(if $(MODEL_QUANTIZE_ENABLED),$(MODEL_FINAL_FILE),$(MODEL_GGUF))
+
+RUN_MODEL ?= $(MODEL_READY_FILE)
+RUN_PROMPT ?= Once
+RUN_ARGS ?=
+
+RISCV_TRIPLE ?= riscv64-unknown-linux-gnu
+RISCV_MARCH ?= rv64gc_zba_zicbop
+RISCV_MABI ?= lp64d
+RISCV_SYSROOT ?= $(or $(shell $(RISCV_TRIPLE)-gcc -print-sysroot 2>/dev/null),$(RISCV)/sysroot)
+
+HOST_CMAKE_ARGS = \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DGGML_CCACHE=OFF \
+	-DGGML_OPENMP=OFF \
+	-DLLAMA_CURL=OFF \
+	-DBUILD_SHARED_LIBS=OFF \
+	-DLLAMA_BUILD_TESTS=OFF \
+	-DLLAMA_BUILD_SERVER=OFF \
+	-DLLAMA_BUILD_TOOLS=ON \
+	-DLLAMA_BUILD_EXAMPLES=ON
+
+TARGET_CMAKE_ARGS = \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_TOOLCHAIN_FILE=$(LLAMA_CPP_HOME)/cmake/riscv64-toolchain.cmake \
+	-DRISCV_ROOT_PATH=$(LLVM_HOME) \
+	-DRISCV_TRIPLE=$(RISCV_TRIPLE) \
+	-DRISCV_MARCH=$(RISCV_MARCH) \
+	-DRISCV_MABI=$(RISCV_MABI) \
+	-DRISCV_USE_LLVM=ON \
+	-DGGML_CCACHE=OFF \
+	-DGGML_OPENMP=OFF \
+	-DLLAMA_CURL=OFF \
+	-DBUILD_SHARED_LIBS=OFF \
+	-DLLAMA_BUILD_TESTS=OFF \
+	-DLLAMA_BUILD_SERVER=OFF \
+	-DLLAMA_BUILD_TOOLS=OFF \
+	-DLLAMA_BUILD_EXAMPLES=ON \
+	-DGGML_RV_AME=ON \
+	-DGGML_RV_ZFH=ON \
+	-DGGML_RV_ZVFH=ON \
+	-DGGML_RVV=ON \
+	-DCMAKE_EXE_LINKER_FLAGS="$(ROOTFS_LINKER_FLAGS)" \
+	$(if $(strip $(RISCV_SYSROOT)),-DRISCV_SYSROOT=$(RISCV_SYSROOT))
+
+.DEFAULT_GOAL := $(TARGET_SIMPLE_BIN)
+
+.PHONY: repo source-ready host-tools riscv fetch-model convert-model quantize-model \
+	prepare-model prepare-stories15m prepare-stories110M install install-model rootfs \
+	run-user print-config clean distclean help
+
+help:
+	@echo "llama.cpp xsai wrapper"
+	@echo "  make -C firmware/riscv-rootfs/apps/llama.cpp print-config"
+	@echo "  make -C firmware/riscv-rootfs/apps/llama.cpp prepare-model"
+	@echo "  make -C firmware/riscv-rootfs/apps/llama.cpp prepare-stories110M"
+	@echo "  make -C firmware/riscv-rootfs/apps/llama.cpp MODEL_PRESET=custom MODEL_KIND=gguf MODEL_SOURCE_PATH=/path/to/model.gguf MODEL_QUANTIZE=0 install"
+	@echo "  make firmware MODEL_PRESET=stories110M"
+
+print-config:
+	@echo "MODEL_PRESET=$(MODEL_PRESET)"
+	@echo "MODEL_KIND=$(MODEL_KIND)"
+	@echo "MODEL_NAME=$(MODEL_NAME)"
+	@echo "MODEL_SOURCE_URL=$(MODEL_SOURCE_URL)"
+	@echo "MODEL_SOURCE_PATH=$(MODEL_SOURCE_PATH)"
+	@echo "MODEL_SOURCE_FILE=$(MODEL_SOURCE_FILE)"
+	@echo "MODEL_GGUF=$(MODEL_GGUF)"
+	@echo "MODEL_FINAL_FILE=$(MODEL_FINAL_FILE)"
+	@echo "MODEL_READY_FILE=$(MODEL_READY_FILE)"
+	@echo "ROOTFS_MODEL_FILE=$(ROOTFS_MODEL_FILE)"
+	@echo "MODEL_QUANTIZE=$(MODEL_QUANTIZE)"
+	@echo "QUANT_TYPE=$(QUANT_TYPE)"
+
+repo: $(REPO_PATH)/CMakeLists.txt
+
+source-ready: $(if $(filter $(REPO_PATH),$(LLAMA_CPP_HOME)),$(REPO_PATH)/CMakeLists.txt,)
+	@if [ ! -f "$(LLAMA_CPP_HOME)/CMakeLists.txt" ]; then \
+		echo "error: llama.cpp source not found at $(LLAMA_CPP_HOME)" >&2; \
+		echo "hint: clone to $(LLAMA_CPP_DEFAULT_HOME) or run 'make repo' in this directory" >&2; \
+		exit 1; \
+	fi
+
+$(REPO_PATH)/CMakeLists.txt:
+	git clone --depth 1 https://github.com/OurCompArchGroup/llama.cpp.git $(REPO_PATH)
+
+$(MODELS_DIR):
+	mkdir -p $@
+
+$(MODEL_DIR): | $(MODELS_DIR)
+	mkdir -p $@
+
+$(ROOTFS_BUILD_DIR):
+	mkdir -p $@
+
+$(HOST_BUILD_DIR)/CMakeCache.txt: | source-ready
+	$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(HOST_BUILD_DIR) $(HOST_CMAKE_ARGS)
+
+$(HOST_TOOLS_STAMP): $(HOST_BUILD_DIR)/CMakeCache.txt
+	$(CMAKE) --build $(HOST_BUILD_DIR) --target llama-convert-llama2c-to-ggml llama-quantize -j$(NPROC)
+	@touch $@
+
+host-tools: $(HOST_TOOLS_STAMP)
+
+$(TARGET_BUILD_DIR)/CMakeCache.txt: | source-ready
+	@if [ -z "$(LLVM_HOME)" ]; then \
+		echo "error: LLVM_HOME is not set" >&2; \
+		exit 1; \
+	fi
+	@if [ ! -x "$(LLVM_HOME)/bin/clang" ]; then \
+		echo "error: clang not found at $(LLVM_HOME)/bin/clang" >&2; \
+		exit 1; \
+	fi
+	$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(TARGET_BUILD_DIR) $(TARGET_CMAKE_ARGS)
+
+$(TARGET_SIMPLE_BIN): $(TARGET_BUILD_DIR)/CMakeCache.txt
+	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple -j$(NPROC)
+
+riscv: $(TARGET_SIMPLE_BIN)
+
+$(MODEL_SOURCE_FILE): | $(MODEL_DIR)
+	@if [ -n "$(MODEL_SOURCE_URL)" ]; then \
+		if command -v curl >/dev/null 2>&1; then \
+			curl -L --fail -o "$@" "$(MODEL_SOURCE_URL)"; \
+		elif command -v wget >/dev/null 2>&1; then \
+			wget -O "$@" "$(MODEL_SOURCE_URL)"; \
+		else \
+			echo "error: neither curl nor wget is available" >&2; \
+			exit 1; \
+		fi; \
+	elif [ -n "$(MODEL_SOURCE_PATH)" ]; then \
+		src="$(abspath $(MODEL_SOURCE_PATH))"; \
+		dst="$(abspath $@)"; \
+		if [ ! -f "$$src" ]; then \
+			echo "error: model source path not found: $$src" >&2; \
+			exit 1; \
+		fi; \
+		if [ "$$src" != "$$dst" ]; then \
+			cp -Lf "$$src" "$@"; \
+		fi; \
+	else \
+		echo "error: set MODEL_SOURCE_URL or MODEL_SOURCE_PATH" >&2; \
+		exit 1; \
+	fi
+
+ifeq ($(MODEL_KIND),llama2c)
+$(MODEL_GGUF): $(MODEL_SOURCE_FILE) $(HOST_TOOLS_STAMP)
+	@if [ ! -f "$(VOCAB_MODEL)" ]; then \
+		echo "error: vocab model not found at $(VOCAB_MODEL)" >&2; \
+		exit 1; \
+	fi
+	$(HOST_BUILD_DIR)/bin/llama-convert-llama2c-to-ggml \
+		--copy-vocab-from-model $(VOCAB_MODEL) \
+		--llama2c-model $(MODEL_SOURCE_FILE) \
+		--llama2c-output-model $(MODEL_GGUF)
+else
+$(MODEL_GGUF): $(MODEL_SOURCE_FILE)
+	@if [ "$(abspath $(MODEL_SOURCE_FILE))" != "$(abspath $(MODEL_GGUF))" ]; then \
+		cp -Lf $(MODEL_SOURCE_FILE) $(MODEL_GGUF); \
+	fi
+endif
+
+ifeq ($(MODEL_QUANTIZE_ENABLED),1)
+$(MODEL_FINAL_FILE): $(MODEL_GGUF) $(HOST_TOOLS_STAMP)
+	$(HOST_BUILD_DIR)/bin/llama-quantize $(MODEL_GGUF) $(MODEL_FINAL_FILE) $(QUANT_TYPE)
+endif
+
+fetch-model: $(MODEL_SOURCE_FILE)
+convert-model: $(MODEL_GGUF)
+quantize-model: $(MODEL_FINAL_FILE)
+prepare-model: $(MODEL_READY_FILE)
+
+prepare-stories15m: MODEL_PRESET = stories15M
+prepare-stories15m: prepare-model
+
+prepare-stories110M: MODEL_PRESET = stories110M
+prepare-stories110M: prepare-model
+
+define install_rootfs_bin
+@mkdir -p $(ROOTFS_BUILD_DIR)
+cp -Lf $(1) $(2)
+@interp=$$(readelf -l "$(2)" 2>/dev/null | sed -n 's/.*Requesting program interpreter: \(.*\)]/\1/p'); \
+if [ -n "$$interp" ] && [ "$$interp" != "$(ROOTFS_INTERPRETER)" ]; then \
+	if ! command -v patchelf >/dev/null 2>&1; then \
+		echo "error: patchelf is required to rewrite interpreter $$interp -> $(ROOTFS_INTERPRETER)" >&2; \
+		echo "hint: prefer building with ROOTFS_LINKER_FLAGS='$(ROOTFS_LINKER_FLAGS)' so patching is unnecessary" >&2; \
+		exit 1; \
+	fi; \
+	patchelf --set-interpreter $(ROOTFS_INTERPRETER) --set-rpath "$(ROOTFS_RPATH)" "$(2)"; \
+fi
+endef
+
+$(ROOTFS_SIMPLE_BIN): $(TARGET_SIMPLE_BIN)
+	$(call install_rootfs_bin,$(TARGET_SIMPLE_BIN),$(ROOTFS_SIMPLE_BIN))
+
+$(ROOTFS_WRAPPER): $(ROOTFS_WRAPPER_SRC)
+	@mkdir -p $(ROOTFS_BUILD_DIR)
+	install -m 755 $(ROOTFS_WRAPPER_SRC) $@
+
+$(ROOTFS_MODEL_FILE): $(MODEL_READY_FILE) | $(ROOTFS_BUILD_DIR)
+	install -m 644 $(MODEL_READY_FILE) $(ROOTFS_MODEL_FILE)
+
+install-model: $(ROOTFS_MODEL_FILE)
+
+install: $(ROOTFS_SIMPLE_BIN) $(ROOTFS_WRAPPER) install-model
+
+rootfs: install
+
+run-user: $(TARGET_SIMPLE_BIN) $(MODEL_READY_FILE)
+	@if [ ! -x "$(QEMU_HOME)/build/qemu-riscv64" ]; then \
+		echo "error: qemu-riscv64 not found at $(QEMU_HOME)/build/qemu-riscv64" >&2; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(RUN_MODEL)" ]; then \
+		echo "error: model not found at $(RUN_MODEL)" >&2; \
+		exit 1; \
+	fi
+	@if [ -z "$(RISCV_SYSROOT)" ]; then \
+		echo "error: RISCV_SYSROOT is empty; ensure riscv64-unknown-linux-gnu-gcc -print-sysroot works" >&2; \
+		exit 1; \
+	fi
+	$(QEMU_HOME)/build/qemu-riscv64 -cpu $(QEMU_USER_CPU_FLAGS) -L $(RISCV_SYSROOT) $(TARGET_SIMPLE_BIN) -m $(RUN_MODEL) "$(RUN_PROMPT)" $(RUN_ARGS)
+
+clean:
+	rm -rf $(HOST_BUILD_DIR) $(TARGET_BUILD_DIR)
+	rm -f $(ROOTFS_SIMPLE_BIN) $(ROOTFS_WRAPPER) $(ROOTFS_MODEL_FILE)
+
+distclean: clean
+	rm -rf $(MODELS_DIR)
+	rm -rf $(REPO_PATH)

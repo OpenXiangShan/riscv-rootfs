@@ -10,6 +10,11 @@ mount -t devtmpfs devtmpfs /dev
 
 hello_status=0
 
+echo "[xsai-init] launching llama-xsai"
+if [ -x /bin/llama-xsai ]; then
+  /bin/llama-xsai --model /root/llama-model.gguf --prompt "${LLAMA_PROMPT:-Once}" || true
+fi
+
 # /bin/before_workload
 echo "[xsai-init] launching hello_xsai"
 /bin/gemm_precomp
