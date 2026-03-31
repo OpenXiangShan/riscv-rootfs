@@ -3,6 +3,9 @@ NAME = llama-simple
 THIS_MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
 APP_DIR := $(patsubst %/,%,$(dir $(THIS_MAKEFILE)))
 XSAI_ENV_ROOT := $(abspath $(APP_DIR)/../../../..)
+XSAI_RESOLVE_RISCV_ENV := $(XSAI_ENV_ROOT)/scripts/resolve-riscv-env.sh
+# Memory layout (QEMU size, kernel RAM, XSAI DMA pool)
+include $(XSAI_ENV_ROOT)/mk/memory.mk
 
 XS_PROJECT_ROOT ?= $(XSAI_ENV_ROOT)
 RISCV_ROOTFS_HOME ?= $(XS_PROJECT_ROOT)/firmware/riscv-rootfs
@@ -21,14 +24,18 @@ endif
 
 CMAKE ?= cmake
 NPROC ?= $(shell nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 8)
+HOST_CC ?= cc
+HOST_CXX ?= c++
 QEMU_HOME ?= $(XS_PROJECT_ROOT)/qemu
 QEMU_USER_CPU_FLAGS ?= rv64,v=true,vlen=128,h=true,zvfh=true,zvfhmin=true,x-matrix=true,rlen=512,mlen=65536,melen=32
 
 HOST_BUILD_DIR := $(APP_DIR)/build-host
 TARGET_BUILD_DIR := $(APP_DIR)/build-riscv
 HOST_TOOLS_STAMP := $(HOST_BUILD_DIR)/.tools-built
-TARGET_SIMPLE_BIN := $(TARGET_BUILD_DIR)/bin/llama-simple
-ROOTFS_SIMPLE_BIN := $(ROOTFS_BUILD_DIR)/llama-simple
+TARGET_SIMPLE_BIN      := $(TARGET_BUILD_DIR)/bin/llama-simple
+ROOTFS_SIMPLE_BIN      := $(ROOTFS_BUILD_DIR)/llama-simple
+TARGET_SIMPLE_XSAI_BIN := $(TARGET_BUILD_DIR)/bin/llama-simple-xsai
+ROOTFS_SIMPLE_XSAI_BIN := $(ROOTFS_BUILD_DIR)/llama-simple-xsai
 ROOTFS_WRAPPER := $(ROOTFS_BUILD_DIR)/llama-xsai
 ROOTFS_WRAPPER_SRC := $(APP_DIR)/llama-xsai.sh
 ROOTFS_MODEL_NAME ?= llama-model.gguf
@@ -38,6 +45,7 @@ MODELS_DIR ?= $(APP_DIR)/models
 MODEL_PRESET ?= stories15M
 STORIES15M_URL ?= https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
 STORIES110M_URL ?= https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin
+QWEN_CODER_URL ?= https://modelscope.cn/models/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/master/qwen2.5-coder-0.5b-instruct-q8_0.gguf
 
 ifeq ($(MODEL_PRESET),stories15M)
 MODEL_KIND ?= llama2c
@@ -48,6 +56,13 @@ ifeq ($(MODEL_PRESET),stories110M)
 MODEL_KIND ?= llama2c
 MODEL_NAME ?= stories110M
 MODEL_SOURCE_URL ?= $(STORIES110M_URL)
+endif
+ifeq ($(MODEL_PRESET),qwen-coder-0.5b)
+MODEL_KIND ?= gguf
+MODEL_NAME ?= qwen-coder-0.5b
+MODEL_SOURCE_PATH ?= $(MODELS_DIR)/qwen-coder-0.5b/qwen-coder-0.5b.gguf
+MODEL_SOURCE_URL ?= $(QWEN_CODER_URL)
+MODEL_QUANTIZE ?= 0
 endif
 
 MODEL_KIND ?= gguf
@@ -79,10 +94,19 @@ RUN_ARGS ?=
 RISCV_TRIPLE ?= riscv64-unknown-linux-gnu
 RISCV_MARCH ?= rv64gc_zba_zicbop
 RISCV_MABI ?= lp64d
-RISCV_SYSROOT ?= $(or $(shell $(RISCV_TRIPLE)-gcc -print-sysroot 2>/dev/null),$(RISCV)/sysroot)
+# cmake cross-compile sysroot: use /opt/riscv/sysroot (real .so files).
+# The env RISCV_SYSROOT=/usr/riscv64-linux-gnu contains apt GNU linker-script
+# stubs that ld.lld cannot handle, so we don't inherit it here.
+LLAMA_RISCV_SYSROOT ?= /opt/riscv/sysroot
+RISCV_SYSROOT_RESOLVED := $(strip $(or $(RISCV_SYSROOT),$(QEMU_LD_PREFIX),$(shell [ -x "$(XSAI_RESOLVE_RISCV_ENV)" ] && "$(XSAI_RESOLVE_RISCV_ENV)" sysroot 2>/dev/null || true),$(shell $(RISCV_TRIPLE)-gcc -print-sysroot 2>/dev/null),$(RISCV)/sysroot))
+ifeq ($(strip $(RISCV_SYSROOT)),)
+RISCV_SYSROOT := $(RISCV_SYSROOT_RESOLVED)
+endif
 
 HOST_CMAKE_ARGS = \
 	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_C_COMPILER=$(HOST_CC) \
+	-DCMAKE_CXX_COMPILER=$(HOST_CXX) \
 	-DGGML_CCACHE=OFF \
 	-DGGML_OPENMP=OFF \
 	-DLLAMA_CURL=OFF \
@@ -113,7 +137,21 @@ TARGET_CMAKE_ARGS = \
 	-DGGML_RV_ZVFH=ON \
 	-DGGML_RVV=ON \
 	-DCMAKE_EXE_LINKER_FLAGS="$(ROOTFS_LINKER_FLAGS)" \
-	$(if $(strip $(RISCV_SYSROOT)),-DRISCV_SYSROOT=$(RISCV_SYSROOT))
+	-DRISCV_SYSROOT=$(LLAMA_RISCV_SYSROOT)
+
+# Custom allocator: route llama.cpp tensor memory into the DMA-coherent
+# reserved physical region (same region as XSAI_DIRECT_MAP_MEM_*).
+# Override LLAMA_DIRECT_MAP_MEM_SIZE for a larger pool than the XSAI default.
+# Defaults come from mk/memory.mk (included above).
+LLAMA_DIRECT_MAP_MEM_START ?= $(XSAI_DIRECT_MAP_MEM_START)
+LLAMA_DIRECT_MAP_MEM_SIZE  ?= $(XSAI_DIRECT_MAP_MEM_SIZE)
+
+ifneq ($(LLAMA_DIRECT_MAP_MEM_START),)
+TARGET_CMAKE_ARGS += \
+	-DGGML_XSAI_ALLOC=ON \
+	-DRESERVED_PHYS_BASE_ADDR=$(LLAMA_DIRECT_MAP_MEM_START)ul \
+	-DRESERVED_MEMORY_SIZE=$(LLAMA_DIRECT_MAP_MEM_SIZE)ul
+endif
 
 .DEFAULT_GOAL := $(TARGET_SIMPLE_BIN)
 
@@ -142,6 +180,7 @@ print-config:
 	@echo "ROOTFS_MODEL_FILE=$(ROOTFS_MODEL_FILE)"
 	@echo "MODEL_QUANTIZE=$(MODEL_QUANTIZE)"
 	@echo "QUANT_TYPE=$(QUANT_TYPE)"
+	@echo "RISCV_SYSROOT=$(RISCV_SYSROOT)"
 
 repo: $(REPO_PATH)/CMakeLists.txt
 
@@ -164,16 +203,24 @@ $(MODEL_DIR): | $(MODELS_DIR)
 $(ROOTFS_BUILD_DIR):
 	mkdir -p $@
 
-$(HOST_BUILD_DIR)/CMakeCache.txt: | source-ready
-	$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(HOST_BUILD_DIR) $(HOST_CMAKE_ARGS)
+.PHONY: host-configure target-configure
 
-$(HOST_TOOLS_STAMP): $(HOST_BUILD_DIR)/CMakeCache.txt
+host-configure: | source-ready
+	@if [ -f "$(HOST_BUILD_DIR)/CMakeCache.txt" ] && rg -q 'CMAKE_(C|CXX)_COMPILER:FILEPATH=.*/riscv64-.*-(gcc|g\+\+)' "$(HOST_BUILD_DIR)/CMakeCache.txt"; then \
+		echo "Reconfiguring llama.cpp host build with native compilers..."; \
+		rm -rf "$(HOST_BUILD_DIR)"; \
+	fi
+	@if [ ! -f "$(HOST_BUILD_DIR)/Makefile" ]; then \
+		$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(HOST_BUILD_DIR) $(HOST_CMAKE_ARGS); \
+	fi
+
+$(HOST_TOOLS_STAMP): host-configure
 	$(CMAKE) --build $(HOST_BUILD_DIR) --target llama-convert-llama2c-to-ggml llama-quantize -j$(NPROC)
 	@touch $@
 
 host-tools: $(HOST_TOOLS_STAMP)
 
-$(TARGET_BUILD_DIR)/CMakeCache.txt: | source-ready
+target-configure: | source-ready
 	@if [ -z "$(LLVM_HOME)" ]; then \
 		echo "error: LLVM_HOME is not set" >&2; \
 		exit 1; \
@@ -182,12 +229,21 @@ $(TARGET_BUILD_DIR)/CMakeCache.txt: | source-ready
 		echo "error: clang not found at $(LLVM_HOME)/bin/clang" >&2; \
 		exit 1; \
 	fi
-	$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(TARGET_BUILD_DIR) $(TARGET_CMAKE_ARGS)
+	@if [ -f "$(TARGET_BUILD_DIR)/CMakeCache.txt" ] && [ ! -f "$(TARGET_BUILD_DIR)/Makefile" ]; then \
+		echo "Reconfiguring incomplete llama.cpp RISC-V build directory..."; \
+		rm -rf "$(TARGET_BUILD_DIR)"; \
+	fi
+	@if [ ! -f "$(TARGET_BUILD_DIR)/Makefile" ]; then \
+		$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(TARGET_BUILD_DIR) $(TARGET_CMAKE_ARGS); \
+	fi
 
-$(TARGET_SIMPLE_BIN): $(TARGET_BUILD_DIR)/CMakeCache.txt
+$(TARGET_SIMPLE_BIN): target-configure
 	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple -j$(NPROC)
 
-riscv: $(TARGET_SIMPLE_BIN)
+$(TARGET_SIMPLE_XSAI_BIN): target-configure $(TARGET_SIMPLE_BIN)
+	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple-xsai -j$(NPROC)
+
+riscv: $(TARGET_SIMPLE_BIN) $(TARGET_SIMPLE_XSAI_BIN)
 
 $(MODEL_SOURCE_FILE): | $(MODEL_DIR)
 	@if [ -n "$(MODEL_SOURCE_URL)" ]; then \
@@ -264,6 +320,9 @@ endef
 $(ROOTFS_SIMPLE_BIN): $(TARGET_SIMPLE_BIN)
 	$(call install_rootfs_bin,$(TARGET_SIMPLE_BIN),$(ROOTFS_SIMPLE_BIN))
 
+$(ROOTFS_SIMPLE_XSAI_BIN): $(TARGET_SIMPLE_XSAI_BIN)
+	$(call install_rootfs_bin,$(TARGET_SIMPLE_XSAI_BIN),$(ROOTFS_SIMPLE_XSAI_BIN))
+
 $(ROOTFS_WRAPPER): $(ROOTFS_WRAPPER_SRC)
 	@mkdir -p $(ROOTFS_BUILD_DIR)
 	install -m 755 $(ROOTFS_WRAPPER_SRC) $@
@@ -273,7 +332,7 @@ $(ROOTFS_MODEL_FILE): $(MODEL_READY_FILE) | $(ROOTFS_BUILD_DIR)
 
 install-model: $(ROOTFS_MODEL_FILE)
 
-install: $(ROOTFS_SIMPLE_BIN) $(ROOTFS_WRAPPER) install-model
+install: $(ROOTFS_SIMPLE_BIN) $(ROOTFS_SIMPLE_XSAI_BIN) $(ROOTFS_WRAPPER) install-model
 
 rootfs: install
 

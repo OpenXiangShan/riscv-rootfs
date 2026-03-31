@@ -1,6 +1,6 @@
 $(shell mkdir -p rootfsimg/build)
 
-APPS = hello_xsai after_workload gemm_precomp busybox before_workload llama.cpp
+APPS = hello_xsai after_workload gemm_precomp busybox before_workload llama.cpp pmu_test
 # trap qemu_trap dtc lkvm-static
 
 APPS_DIR = $(addprefix apps/, $(APPS))

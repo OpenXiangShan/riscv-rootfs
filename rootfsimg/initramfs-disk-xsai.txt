@@ -4,7 +4,9 @@ file /bin/before_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/before_workload 7
 file /bin/gemm_precomp ${RISCV_ROOTFS_HOME}/rootfsimg/build/gemm_precomp 755 0 0
 file /bin/hello_xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/hello_xsai 755 0 0
 file /bin/after_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/after_workload 755 0 0
+file /bin/pmu_test ${RISCV_ROOTFS_HOME}/rootfsimg/build/pmu_test 755 0 0
 file /bin/llama-simple ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-simple 755 0 0
+file /bin/llama-simple-xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-simple-xsai 755 0 0
 file /bin/llama-xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-xsai 755 0 0
 file /root/llama-model.gguf ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-model.gguf 644 0 0
 file /etc/init ${RISCV_ROOTFS_HOME}/rootfsimg/init-disk-xsai.sh 755 0 0
