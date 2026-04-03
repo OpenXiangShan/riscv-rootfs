@@ -36,6 +36,10 @@ TARGET_SIMPLE_BIN      := $(TARGET_BUILD_DIR)/bin/llama-simple
 ROOTFS_SIMPLE_BIN      := $(ROOTFS_BUILD_DIR)/llama-simple
 TARGET_SIMPLE_XSAI_BIN := $(TARGET_BUILD_DIR)/bin/llama-simple-xsai
 ROOTFS_SIMPLE_XSAI_BIN := $(ROOTFS_BUILD_DIR)/llama-simple-xsai
+TARGET_BENCH_BIN       := $(TARGET_BUILD_DIR)/bin/llama-bench
+ROOTFS_BENCH_BIN       := $(ROOTFS_BUILD_DIR)/llama-bench
+TARGET_BATCHED_BENCH_BIN := $(TARGET_BUILD_DIR)/bin/llama-batched-bench
+ROOTFS_BATCHED_BENCH_BIN := $(ROOTFS_BUILD_DIR)/llama-batched-bench
 ROOTFS_WRAPPER := $(ROOTFS_BUILD_DIR)/llama-xsai
 ROOTFS_WRAPPER_SRC := $(APP_DIR)/llama-xsai.sh
 ROOTFS_MODEL_NAME ?= llama-model.gguf
@@ -94,10 +98,9 @@ RUN_ARGS ?=
 RISCV_TRIPLE ?= riscv64-unknown-linux-gnu
 RISCV_MARCH ?= rv64gc_zba_zicbop
 RISCV_MABI ?= lp64d
-# cmake cross-compile sysroot: use /opt/riscv/sysroot (real .so files).
-# The env RISCV_SYSROOT=/usr/riscv64-linux-gnu contains apt GNU linker-script
-# stubs that ld.lld cannot handle, so we don't inherit it here.
-LLAMA_RISCV_SYSROOT ?= /opt/riscv/sysroot
+# cmake cross-compile sysroot: prefer the active env/toolchain sysroot and
+# fall back only if nothing else is available.
+LLAMA_RISCV_SYSROOT ?= $(strip $(or $(RISCV_SYSROOT),$(QEMU_LD_PREFIX),$(shell [ -x "$(XSAI_RESOLVE_RISCV_ENV)" ] && "$(XSAI_RESOLVE_RISCV_ENV)" sysroot 2>/dev/null || true),$(shell $(RISCV_TRIPLE)-gcc -print-sysroot 2>/dev/null),$(RISCV)/sysroot,/opt/riscv/sysroot))
 RISCV_SYSROOT_RESOLVED := $(strip $(or $(RISCV_SYSROOT),$(QEMU_LD_PREFIX),$(shell [ -x "$(XSAI_RESOLVE_RISCV_ENV)" ] && "$(XSAI_RESOLVE_RISCV_ENV)" sysroot 2>/dev/null || true),$(shell $(RISCV_TRIPLE)-gcc -print-sysroot 2>/dev/null),$(RISCV)/sysroot))
 ifeq ($(strip $(RISCV_SYSROOT)),)
 RISCV_SYSROOT := $(RISCV_SYSROOT_RESOLVED)
@@ -127,10 +130,11 @@ TARGET_CMAKE_ARGS = \
 	-DGGML_CCACHE=OFF \
 	-DGGML_OPENMP=OFF \
 	-DLLAMA_CURL=OFF \
+	-DLLAMA_OPENSSL=OFF \
 	-DBUILD_SHARED_LIBS=OFF \
 	-DLLAMA_BUILD_TESTS=OFF \
 	-DLLAMA_BUILD_SERVER=OFF \
-	-DLLAMA_BUILD_TOOLS=OFF \
+	-DLLAMA_BUILD_TOOLS=ON \
 	-DLLAMA_BUILD_EXAMPLES=ON \
 	-DGGML_RV_AME=ON \
 	-DGGML_RV_ZFH=ON \
@@ -181,6 +185,9 @@ print-config:
 	@echo "MODEL_QUANTIZE=$(MODEL_QUANTIZE)"
 	@echo "QUANT_TYPE=$(QUANT_TYPE)"
 	@echo "RISCV_SYSROOT=$(RISCV_SYSROOT)"
+	@echo "LLAMA_RISCV_SYSROOT=$(LLAMA_RISCV_SYSROOT)"
+	@echo "LLAMA_DIRECT_MAP_MEM_START=$(LLAMA_DIRECT_MAP_MEM_START)"
+	@echo "LLAMA_DIRECT_MAP_MEM_SIZE=$(LLAMA_DIRECT_MAP_MEM_SIZE)"
 
 repo: $(REPO_PATH)/CMakeLists.txt
 
@@ -206,7 +213,7 @@ $(ROOTFS_BUILD_DIR):
 .PHONY: host-configure target-configure
 
 host-configure: | source-ready
-	@if [ -f "$(HOST_BUILD_DIR)/CMakeCache.txt" ] && rg -q 'CMAKE_(C|CXX)_COMPILER:FILEPATH=.*/riscv64-.*-(gcc|g\+\+)' "$(HOST_BUILD_DIR)/CMakeCache.txt"; then \
+	@if [ -f "$(HOST_BUILD_DIR)/CMakeCache.txt" ] && grep -Eq 'CMAKE_(C|CXX)_COMPILER:FILEPATH=.*/riscv64-.*-(gcc|g\+\+)' "$(HOST_BUILD_DIR)/CMakeCache.txt"; then \
 		echo "Reconfiguring llama.cpp host build with native compilers..."; \
 		rm -rf "$(HOST_BUILD_DIR)"; \
 	fi
@@ -233,6 +240,25 @@ target-configure: | source-ready
 		echo "Reconfiguring incomplete llama.cpp RISC-V build directory..."; \
 		rm -rf "$(TARGET_BUILD_DIR)"; \
 	fi
+	@if [ -f "$(TARGET_BUILD_DIR)/CMakeCache.txt" ]; then \
+		cached_sysroot=$$(grep '^RISCV_SYSROOT:PATH=' "$(TARGET_BUILD_DIR)/CMakeCache.txt" | head -n1 | cut -d= -f2-); \
+		cached_phys_base=$$(grep '^RESERVED_PHYS_BASE_ADDR:' "$(TARGET_BUILD_DIR)/CMakeCache.txt" | head -n1 | cut -d= -f2-); \
+		cached_mem_size=$$(grep '^RESERVED_MEMORY_SIZE:' "$(TARGET_BUILD_DIR)/CMakeCache.txt" | head -n1 | cut -d= -f2-); \
+		cached_build_tools=$$(grep '^LLAMA_BUILD_TOOLS:BOOL=' "$(TARGET_BUILD_DIR)/CMakeCache.txt" | head -n1 | cut -d= -f2-); \
+		cached_openssl=$$(grep '^LLAMA_OPENSSL:BOOL=' "$(TARGET_BUILD_DIR)/CMakeCache.txt" | head -n1 | cut -d= -f2-); \
+		expected_phys_base='$(LLAMA_DIRECT_MAP_MEM_START)ul'; \
+		expected_mem_size='$(LLAMA_DIRECT_MAP_MEM_SIZE)ul'; \
+		expected_build_tools='ON'; \
+		expected_openssl='OFF'; \
+		if [ "$$cached_sysroot" != "$(LLAMA_RISCV_SYSROOT)" ] || \
+		   [ "$$cached_phys_base" != "$$expected_phys_base" ] || \
+		   [ "$$cached_mem_size" != "$$expected_mem_size" ] || \
+		   [ "$$cached_build_tools" != "$$expected_build_tools" ] || \
+		   [ "$$cached_openssl" != "$$expected_openssl" ]; then \
+			echo "Reconfiguring llama.cpp RISC-V build due to cache mismatch..."; \
+			rm -rf "$(TARGET_BUILD_DIR)"; \
+		fi; \
+	fi
 	@if [ ! -f "$(TARGET_BUILD_DIR)/Makefile" ]; then \
 		$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(TARGET_BUILD_DIR) $(TARGET_CMAKE_ARGS); \
 	fi
@@ -243,7 +269,13 @@ $(TARGET_SIMPLE_BIN): target-configure
 $(TARGET_SIMPLE_XSAI_BIN): target-configure $(TARGET_SIMPLE_BIN)
 	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple-xsai -j$(NPROC)
 
-riscv: $(TARGET_SIMPLE_BIN) $(TARGET_SIMPLE_XSAI_BIN)
+$(TARGET_BENCH_BIN): target-configure
+	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-bench -j$(NPROC)
+
+$(TARGET_BATCHED_BENCH_BIN): target-configure
+	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-batched-bench -j$(NPROC)
+
+riscv: $(TARGET_SIMPLE_BIN) $(TARGET_SIMPLE_XSAI_BIN) $(TARGET_BENCH_BIN) $(TARGET_BATCHED_BENCH_BIN)
 
 $(MODEL_SOURCE_FILE): | $(MODEL_DIR)
 	@if [ -n "$(MODEL_SOURCE_URL)" ]; then \
@@ -323,6 +355,12 @@ $(ROOTFS_SIMPLE_BIN): $(TARGET_SIMPLE_BIN)
 $(ROOTFS_SIMPLE_XSAI_BIN): $(TARGET_SIMPLE_XSAI_BIN)
 	$(call install_rootfs_bin,$(TARGET_SIMPLE_XSAI_BIN),$(ROOTFS_SIMPLE_XSAI_BIN))
 
+$(ROOTFS_BENCH_BIN): $(TARGET_BENCH_BIN)
+	$(call install_rootfs_bin,$(TARGET_BENCH_BIN),$(ROOTFS_BENCH_BIN))
+
+$(ROOTFS_BATCHED_BENCH_BIN): $(TARGET_BATCHED_BENCH_BIN)
+	$(call install_rootfs_bin,$(TARGET_BATCHED_BENCH_BIN),$(ROOTFS_BATCHED_BENCH_BIN))
+
 $(ROOTFS_WRAPPER): $(ROOTFS_WRAPPER_SRC)
 	@mkdir -p $(ROOTFS_BUILD_DIR)
 	install -m 755 $(ROOTFS_WRAPPER_SRC) $@
@@ -332,7 +370,7 @@ $(ROOTFS_MODEL_FILE): $(MODEL_READY_FILE) | $(ROOTFS_BUILD_DIR)
 
 install-model: $(ROOTFS_MODEL_FILE)
 
-install: $(ROOTFS_SIMPLE_BIN) $(ROOTFS_SIMPLE_XSAI_BIN) $(ROOTFS_WRAPPER) install-model
+install: $(ROOTFS_SIMPLE_BIN) $(ROOTFS_SIMPLE_XSAI_BIN) $(ROOTFS_BENCH_BIN) $(ROOTFS_BATCHED_BENCH_BIN) $(ROOTFS_WRAPPER) install-model
 
 rootfs: install
 
@@ -353,7 +391,7 @@ run-user: $(TARGET_SIMPLE_BIN) $(MODEL_READY_FILE)
 
 clean:
 	rm -rf $(HOST_BUILD_DIR) $(TARGET_BUILD_DIR)
-	rm -f $(ROOTFS_SIMPLE_BIN) $(ROOTFS_WRAPPER) $(ROOTFS_MODEL_FILE)
+	rm -f $(ROOTFS_SIMPLE_BIN) $(ROOTFS_SIMPLE_XSAI_BIN) $(ROOTFS_BENCH_BIN) $(ROOTFS_BATCHED_BENCH_BIN) $(ROOTFS_WRAPPER) $(ROOTFS_MODEL_FILE)
 
 distclean: clean
 	rm -rf $(MODELS_DIR)

@@ -8,9 +8,35 @@ mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 mount -t devtmpfs devtmpfs /dev
 
-/bin/hello_xsai || true
-/bin/gemm_precomp || true
-/bin/before_workload || true
+LLAMA_MODEL=/root/llama-model.gguf
+MODEL_MNT=/models
+
+mkdir -p "$MODEL_MNT"
+if [ -b /dev/vda ]; then
+  echo "[xsai-init] trying to mount /dev/vda"
+  if mount -o ro,noload /dev/vda "$MODEL_MNT" 2>/dev/null || \
+     mount -o ro /dev/vda "$MODEL_MNT" 2>/dev/null || \
+     mount /dev/vda "$MODEL_MNT" 2>/dev/null; then
+    if [ -f "$MODEL_MNT/model.gguf" ]; then
+      LLAMA_MODEL="$MODEL_MNT/model.gguf"
+    else
+      set -- "$MODEL_MNT"/*.gguf
+      if [ "$1" != "$MODEL_MNT/*.gguf" ] && [ -f "$1" ]; then
+        LLAMA_MODEL="$1"
+      fi
+    fi
+  else
+    echo "[xsai-init] warning: failed to mount /dev/vda; using initramfs model"
+  fi
+else
+  echo "[xsai-init] no /dev/vda; using initramfs model"
+fi
+
+echo "[xsai-init] model path: $LLAMA_MODEL"
+# /bin/hello_xsai || true
+# /bin/gemm_precomp || true
+/bin/llama-bench -m $LLAMA_MODEL -t 1 -p 512 -n 0 || true
+# /bin/before_workload || true
 # Enable user-mode access to hardware performance counters (rdcycle / rdinstret).
 # The riscv_pmu_sbi driver exposes this via perf_user_access sysctl:
 #   0 = no user access (scounteren = 0x0)
@@ -52,14 +78,14 @@ LLAMA_PROMPT="once upon a time, in a forest where the trees never lost their lea
 # <|im_start|>assistant
 # "
 echo "[xsai-init] launching llama-xsai"
-/bin/llama-simple-xsai -m /root/llama-model.gguf "$LLAMA_PROMPT" || hello_status=$?
+/bin/llama-simple-xsai -m "$LLAMA_MODEL" "$LLAMA_PROMPT" || hello_status=$?
 /bin/after_workload "$hello_status"
 echo "[xsai-init] THP counters before llama:"
 grep -E 'AnonHugePages|FileHugePages|ShmemHugePages' /proc/meminfo || true
 grep 'thp_fault_alloc\|thp_collapse_alloc\|thp_file_mapped\|thp_file_alloc' /proc/vmstat || true
 
 if [ -x /bin/llama-xsai ]; then
-  /bin/llama-xsai --model /root/llama-model.gguf --prompt "${LLAMA_PROMPT:-Once}" || true
+  /bin/llama-xsai --model "$LLAMA_MODEL" --prompt "${LLAMA_PROMPT:-Once}" || true
 fi
 
 echo "[xsai-init] THP counters after llama:"
