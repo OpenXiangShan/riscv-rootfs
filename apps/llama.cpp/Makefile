@@ -26,12 +26,18 @@ CMAKE ?= cmake
 NPROC ?= $(shell nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 8)
 HOST_CC ?= cc
 HOST_CXX ?= c++
+HOST_NO_CET_FLAG ?= -fcf-protection=none
+HOST_CFLAGS ?=
+HOST_CXXFLAGS ?=
+HOST_EFFECTIVE_CFLAGS := $(strip $(HOST_CFLAGS) $(HOST_NO_CET_FLAG))
+HOST_EFFECTIVE_CXXFLAGS := $(strip $(HOST_CXXFLAGS) $(HOST_NO_CET_FLAG))
 QEMU_HOME ?= $(XS_PROJECT_ROOT)/qemu
 QEMU_USER_CPU_FLAGS ?= rv64,v=true,vlen=128,h=true,zvfh=true,zvfhmin=true,x-matrix=true,rlen=512,mlen=65536,melen=32
 
 HOST_BUILD_DIR := $(APP_DIR)/build-host
 TARGET_BUILD_DIR := $(APP_DIR)/build-riscv
 HOST_TOOLS_STAMP := $(HOST_BUILD_DIR)/.tools-built
+TARGET_TOOLS_STAMP := $(TARGET_BUILD_DIR)/.tools-built
 TARGET_SIMPLE_BIN      := $(TARGET_BUILD_DIR)/bin/llama-simple
 ROOTFS_SIMPLE_BIN      := $(ROOTFS_BUILD_DIR)/llama-simple
 TARGET_SIMPLE_XSAI_BIN := $(TARGET_BUILD_DIR)/bin/llama-simple-xsai
@@ -110,6 +116,8 @@ HOST_CMAKE_ARGS = \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_C_COMPILER=$(HOST_CC) \
 	-DCMAKE_CXX_COMPILER=$(HOST_CXX) \
+	-DCMAKE_C_FLAGS="$(HOST_EFFECTIVE_CFLAGS)" \
+	-DCMAKE_CXX_FLAGS="$(HOST_EFFECTIVE_CXXFLAGS)" \
 	-DGGML_CCACHE=OFF \
 	-DGGML_OPENMP=OFF \
 	-DLLAMA_CURL=OFF \
@@ -213,9 +221,17 @@ $(ROOTFS_BUILD_DIR):
 .PHONY: host-configure target-configure
 
 host-configure: | source-ready
-	@if [ -f "$(HOST_BUILD_DIR)/CMakeCache.txt" ] && grep -Eq 'CMAKE_(C|CXX)_COMPILER:FILEPATH=.*/riscv64-.*-(gcc|g\+\+)' "$(HOST_BUILD_DIR)/CMakeCache.txt"; then \
-		echo "Reconfiguring llama.cpp host build with native compilers..."; \
-		rm -rf "$(HOST_BUILD_DIR)"; \
+	@if [ -f "$(HOST_BUILD_DIR)/CMakeCache.txt" ]; then \
+		cached_c_flags=$$(grep '^CMAKE_C_FLAGS:STRING=' "$(HOST_BUILD_DIR)/CMakeCache.txt" | head -n1 | cut -d= -f2-); \
+		cached_cxx_flags=$$(grep '^CMAKE_CXX_FLAGS:STRING=' "$(HOST_BUILD_DIR)/CMakeCache.txt" | head -n1 | cut -d= -f2-); \
+		expected_c_flags='$(HOST_EFFECTIVE_CFLAGS)'; \
+		expected_cxx_flags='$(HOST_EFFECTIVE_CXXFLAGS)'; \
+		if grep -Eq 'CMAKE_(C|CXX)_COMPILER:FILEPATH=.*/riscv64-.*-(gcc|g\+\+)' "$(HOST_BUILD_DIR)/CMakeCache.txt" || \
+		   [ "$$cached_c_flags" != "$$expected_c_flags" ] || \
+		   [ "$$cached_cxx_flags" != "$$expected_cxx_flags" ]; then \
+			echo "Reconfiguring llama.cpp host build with native compilers and host flags..."; \
+			rm -rf "$(HOST_BUILD_DIR)"; \
+		fi; \
 	fi
 	@if [ ! -f "$(HOST_BUILD_DIR)/Makefile" ]; then \
 		$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(HOST_BUILD_DIR) $(HOST_CMAKE_ARGS); \
@@ -226,6 +242,10 @@ $(HOST_TOOLS_STAMP): host-configure
 	@touch $@
 
 host-tools: $(HOST_TOOLS_STAMP)
+
+$(TARGET_TOOLS_STAMP): target-configure
+	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple llama-simple-xsai llama-bench llama-batched-bench -j$(NPROC)
+	@touch $@
 
 target-configure: | source-ready
 	@if [ -z "$(LLVM_HOME)" ]; then \
@@ -263,17 +283,8 @@ target-configure: | source-ready
 		$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(TARGET_BUILD_DIR) $(TARGET_CMAKE_ARGS); \
 	fi
 
-$(TARGET_SIMPLE_BIN): target-configure
-	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple -j$(NPROC)
-
-$(TARGET_SIMPLE_XSAI_BIN): target-configure $(TARGET_SIMPLE_BIN)
-	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple-xsai -j$(NPROC)
-
-$(TARGET_BENCH_BIN): target-configure
-	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-bench -j$(NPROC)
-
-$(TARGET_BATCHED_BENCH_BIN): target-configure
-	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-batched-bench -j$(NPROC)
+$(TARGET_SIMPLE_BIN) $(TARGET_SIMPLE_XSAI_BIN) $(TARGET_BENCH_BIN) $(TARGET_BATCHED_BENCH_BIN): $(TARGET_TOOLS_STAMP)
+	@test -x "$@"
 
 riscv: $(TARGET_SIMPLE_BIN) $(TARGET_SIMPLE_XSAI_BIN) $(TARGET_BENCH_BIN) $(TARGET_BATCHED_BENCH_BIN)
 
