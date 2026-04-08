@@ -35,8 +35,8 @@ fi
 echo "[xsai-init] model path: $LLAMA_MODEL"
 # /bin/hello_xsai || true
 # /bin/gemm_precomp || true
-/bin/llama-bench -m $LLAMA_MODEL -t 1 -p 512 -n 0 || true
-# /bin/before_workload || true
+/bin/llama-bench -m $LLAMA_MODEL -t 1 -p 512 -n 0 --no-warmup || true
+/bin/after_workload || true
 # Enable user-mode access to hardware performance counters (rdcycle / rdinstret).
 # The riscv_pmu_sbi driver exposes this via perf_user_access sysctl:
 #   0 = no user access (scounteren = 0x0)

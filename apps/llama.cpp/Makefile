@@ -36,8 +36,10 @@ QEMU_USER_CPU_FLAGS ?= rv64,v=true,vlen=128,h=true,zvfh=true,zvfhmin=true,x-matr
 
 HOST_BUILD_DIR := $(APP_DIR)/build-host
 TARGET_BUILD_DIR := $(APP_DIR)/build-riscv
-HOST_TOOLS_STAMP := $(HOST_BUILD_DIR)/.tools-built
+HOST_TOOLS_STAMP := $(HOST_BUILD_DIR)/.tools-ready
 TARGET_TOOLS_STAMP := $(TARGET_BUILD_DIR)/.tools-built
+HOST_CONVERT_BIN := $(HOST_BUILD_DIR)/bin/llama-convert-llama2c-to-ggml
+HOST_QUANTIZE_BIN := $(HOST_BUILD_DIR)/bin/llama-quantize
 TARGET_SIMPLE_BIN      := $(TARGET_BUILD_DIR)/bin/llama-simple
 ROOTFS_SIMPLE_BIN      := $(ROOTFS_BUILD_DIR)/llama-simple
 TARGET_SIMPLE_XSAI_BIN := $(TARGET_BUILD_DIR)/bin/llama-simple-xsai
@@ -218,7 +220,7 @@ $(MODEL_DIR): | $(MODELS_DIR)
 $(ROOTFS_BUILD_DIR):
 	mkdir -p $@
 
-.PHONY: host-configure target-configure
+.PHONY: host-configure target-configure host-tools
 
 host-configure: | source-ready
 	@if [ -f "$(HOST_BUILD_DIR)/CMakeCache.txt" ]; then \
@@ -237,15 +239,43 @@ host-configure: | source-ready
 		$(CMAKE) -S $(LLAMA_CPP_HOME) -B $(HOST_BUILD_DIR) $(HOST_CMAKE_ARGS); \
 	fi
 
-$(HOST_TOOLS_STAMP): host-configure
-	$(CMAKE) --build $(HOST_BUILD_DIR) --target llama-convert-llama2c-to-ggml llama-quantize -j$(NPROC)
-	@touch $@
 
-host-tools: $(HOST_TOOLS_STAMP)
+$(HOST_CONVERT_BIN): $(THIS_MAKEFILE) $(LLAMA_CPP_HOME)/CMakeLists.txt | source-ready
+	@$(MAKE) --no-print-directory host-configure
+	@if [ ! -f "$(HOST_TOOLS_STAMP)" ] || \
+	   [ "$(HOST_TOOLS_STAMP)" -ot "$(THIS_MAKEFILE)" ] || \
+	   [ "$(HOST_TOOLS_STAMP)" -ot "$(LLAMA_CPP_HOME)/CMakeLists.txt" ] || \
+	   [ ! -x "$(HOST_CONVERT_BIN)" ] || \
+	   [ ! -x "$(HOST_QUANTIZE_BIN)" ]; then \
+		$(CMAKE) --build $(HOST_BUILD_DIR) --target llama-convert-llama2c-to-ggml llama-quantize -j$(NPROC); \
+		touch "$(HOST_TOOLS_STAMP)"; \
+	fi
+	@test -x "$@"
+
+$(HOST_QUANTIZE_BIN): $(HOST_CONVERT_BIN)
+	@test -x "$@"
+
+host-tools: $(HOST_CONVERT_BIN) $(HOST_QUANTIZE_BIN)
 
 $(TARGET_TOOLS_STAMP): target-configure
-	$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple llama-simple-xsai llama-bench llama-batched-bench -j$(NPROC)
-	@touch $@
+	@needs_build=0; \
+	if [ ! -f "$@" ] || \
+	   [ "$@" -ot "$(THIS_MAKEFILE)" ] || \
+	   [ "$@" -ot "$(LLAMA_CPP_HOME)/CMakeLists.txt" ] || \
+	   [ ! -x "$(TARGET_SIMPLE_BIN)" ] || \
+	   [ ! -x "$(TARGET_SIMPLE_XSAI_BIN)" ] || \
+	   [ ! -x "$(TARGET_BENCH_BIN)" ] || \
+	   [ ! -x "$(TARGET_BATCHED_BENCH_BIN)" ]; then \
+		needs_build=1; \
+	elif find "$(LLAMA_CPP_HOME)/cmake" "$(LLAMA_CPP_HOME)/common" "$(LLAMA_CPP_HOME)/examples" "$(LLAMA_CPP_HOME)/ggml" "$(LLAMA_CPP_HOME)/include" "$(LLAMA_CPP_HOME)/src" "$(LLAMA_CPP_HOME)/tools" \
+		-type f \( -name 'CMakeLists.txt' -o -name '*.cmake' -o -name '*.c' -o -name '*.cc' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
+		-newer "$@" -print -quit 2>/dev/null | grep -q .; then \
+		needs_build=1; \
+	fi; \
+	if [ $$needs_build -eq 1 ]; then \
+		$(CMAKE) --build $(TARGET_BUILD_DIR) --target llama-simple llama-simple-xsai llama-bench llama-batched-bench -j$(NPROC); \
+		touch $@; \
+	fi
 
 target-configure: | source-ready
 	@if [ -z "$(LLVM_HOME)" ]; then \
@@ -305,7 +335,7 @@ $(MODEL_SOURCE_FILE): | $(MODEL_DIR)
 			echo "error: model source path not found: $$src" >&2; \
 			exit 1; \
 		fi; \
-		if [ "$$src" != "$$dst" ]; then \
+		if [ "$$src" != "$$dst" ] && { [ ! -f "$@" ] || ! cmp -s "$$src" "$@"; }; then \
 			cp -Lf "$$src" "$@"; \
 		fi; \
 	else \
@@ -314,25 +344,29 @@ $(MODEL_SOURCE_FILE): | $(MODEL_DIR)
 	fi
 
 ifeq ($(MODEL_KIND),llama2c)
-$(MODEL_GGUF): $(MODEL_SOURCE_FILE) $(HOST_TOOLS_STAMP)
+$(MODEL_GGUF): $(MODEL_SOURCE_FILE) $(HOST_CONVERT_BIN)
 	@if [ ! -f "$(VOCAB_MODEL)" ]; then \
 		echo "error: vocab model not found at $(VOCAB_MODEL)" >&2; \
 		exit 1; \
 	fi
-	$(HOST_BUILD_DIR)/bin/llama-convert-llama2c-to-ggml \
-		--copy-vocab-from-model $(VOCAB_MODEL) \
-		--llama2c-model $(MODEL_SOURCE_FILE) \
-		--llama2c-output-model $(MODEL_GGUF)
+	@if [ ! -f "$@" ] || [ "$@" -ot "$(MODEL_SOURCE_FILE)" ] || [ "$@" -ot "$(VOCAB_MODEL)" ] || [ "$@" -ot "$(HOST_CONVERT_BIN)" ]; then \
+		$(HOST_CONVERT_BIN) \
+			--copy-vocab-from-model $(VOCAB_MODEL) \
+			--llama2c-model $(MODEL_SOURCE_FILE) \
+			--llama2c-output-model $(MODEL_GGUF); \
+	fi
 else
 $(MODEL_GGUF): $(MODEL_SOURCE_FILE)
-	@if [ "$(abspath $(MODEL_SOURCE_FILE))" != "$(abspath $(MODEL_GGUF))" ]; then \
+	@if [ "$(abspath $(MODEL_SOURCE_FILE))" != "$(abspath $(MODEL_GGUF))" ] && { [ ! -f "$@" ] || ! cmp -s "$(MODEL_SOURCE_FILE)" "$@"; }; then \
 		cp -Lf $(MODEL_SOURCE_FILE) $(MODEL_GGUF); \
 	fi
 endif
 
 ifeq ($(MODEL_QUANTIZE_ENABLED),1)
-$(MODEL_FINAL_FILE): $(MODEL_GGUF) $(HOST_TOOLS_STAMP)
-	$(HOST_BUILD_DIR)/bin/llama-quantize $(MODEL_GGUF) $(MODEL_FINAL_FILE) $(QUANT_TYPE)
+$(MODEL_FINAL_FILE): $(MODEL_GGUF) $(HOST_QUANTIZE_BIN)
+	@if [ ! -f "$@" ] || [ "$@" -ot "$(MODEL_GGUF)" ] || [ "$@" -ot "$(HOST_QUANTIZE_BIN)" ]; then \
+		$(HOST_QUANTIZE_BIN) $(MODEL_GGUF) $(MODEL_FINAL_FILE) $(QUANT_TYPE); \
+	fi
 endif
 
 fetch-model: $(MODEL_SOURCE_FILE)
@@ -348,7 +382,9 @@ prepare-stories110M: prepare-model
 
 define install_rootfs_bin
 @mkdir -p $(ROOTFS_BUILD_DIR)
-cp -Lf $(1) $(2)
+@if [ ! -f "$(2)" ] || ! cmp -s "$(1)" "$(2)"; then \
+	cp -Lf $(1) $(2); \
+fi
 @interp=$$(readelf -l "$(2)" 2>/dev/null | sed -n 's/.*Requesting program interpreter: \(.*\)]/\1/p'); \
 if [ -n "$$interp" ] && [ "$$interp" != "$(ROOTFS_INTERPRETER)" ]; then \
 	if ! command -v patchelf >/dev/null 2>&1; then \
@@ -377,7 +413,9 @@ $(ROOTFS_WRAPPER): $(ROOTFS_WRAPPER_SRC)
 	install -m 755 $(ROOTFS_WRAPPER_SRC) $@
 
 $(ROOTFS_MODEL_FILE): $(MODEL_READY_FILE) | $(ROOTFS_BUILD_DIR)
-	install -m 644 $(MODEL_READY_FILE) $(ROOTFS_MODEL_FILE)
+	@if [ ! -f "$@" ] || ! cmp -s "$(MODEL_READY_FILE)" "$@"; then \
+		install -m 644 $(MODEL_READY_FILE) $(ROOTFS_MODEL_FILE); \
+	fi
 
 install-model: $(ROOTFS_MODEL_FILE)
 
