@@ -29,8 +29,8 @@ HOST_CXX ?= c++
 HOST_NO_CET_FLAG ?= -fcf-protection=none
 HOST_CFLAGS ?=
 HOST_CXXFLAGS ?=
-HOST_EFFECTIVE_CFLAGS := $(strip $(HOST_CFLAGS) $(HOST_NO_CET_FLAG))
-HOST_EFFECTIVE_CXXFLAGS := $(strip $(HOST_CXXFLAGS) $(HOST_NO_CET_FLAG))
+HOST_EFFECTIVE_CFLAGS := $(strip $(HOST_CFLAGS) $(HOST_NO_CET_FLAG)) -Wno-gnu-zero-variadic-macro-arguments
+HOST_EFFECTIVE_CXXFLAGS := $(strip $(HOST_CXXFLAGS) $(HOST_NO_CET_FLAG)) -Wno-gnu-zero-variadic-macro-arguments
 QEMU_HOME ?= $(XS_PROJECT_ROOT)/qemu
 QEMU_USER_CPU_FLAGS ?= rv64,v=true,vlen=128,h=true,zvfh=true,zvfhmin=true,x-matrix=true,rlen=512,mlen=65536,melen=32
 
@@ -131,6 +131,8 @@ HOST_CMAKE_ARGS = \
 
 TARGET_CMAKE_ARGS = \
 	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_C_FLAGS="-Wno-gnu-zero-variadic-macro-arguments" \
+    -DCMAKE_CXX_FLAGS="-Wno-gnu-zero-variadic-macro-arguments"\
 	-DCMAKE_TOOLCHAIN_FILE=$(LLAMA_CPP_HOME)/cmake/riscv64-toolchain.cmake \
 	-DRISCV_ROOT_PATH=$(LLVM_HOME) \
 	-DRISCV_TRIPLE=$(RISCV_TRIPLE) \

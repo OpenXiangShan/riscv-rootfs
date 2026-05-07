@@ -27,6 +27,7 @@ int main(void) {
         return ret;
     }
     nemu_signal(DISABLE_TIME_INTR);
+    nemu_signal(NOTIFY_PROFILER);
     ret = auto_test();
     nemu_signal(ret);
     return 0;

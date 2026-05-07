@@ -10,7 +10,10 @@
 !*.patch
 !*.txt
 !*.md
+!*.gguf.om
 !riscv-lib-paths.mk
 repo/
 build/
 build-*/
+!apps/llama.cpp/.github/skills/build-host-binaries/
+!apps/llama.cpp/.github/skills/build-host-binaries/**

@@ -10,7 +10,15 @@ file /bin/llama-simple-xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-simple-xs
 file /bin/llama-bench ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-bench 755 0 0
 file /bin/llama-batched-bench ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-batched-bench 755 0 0
 file /bin/llama-xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-xsai 755 0 0
-file /root/llama-model.gguf ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-model.gguf 644 0 0
+# file /root/llama-model.gguf ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-model.gguf 644 0 0
+file /root/llama3.2_1b_q8.gguf.om ${RISCV_ROOTFS_HOME}/apps/llama.cpp/models/llama3.2_1b_q8.gguf.om 644 0 0
+file /root/stories15M-q8_0.gguf.om ${RISCV_ROOTFS_HOME}/apps/llama.cpp/models/stories15M-q8_0.gguf.om 644 0 0
+file /root/qwen3_0.6b_q8.gguf.om ${RISCV_ROOTFS_HOME}/apps/llama.cpp/models/qwen3_0.6b_q8.gguf.om 644 0 0
+file /root/DeepSeek-R1-Distill-Qwen-1.5B-q8_0.gguf.om ${RISCV_ROOTFS_HOME}/apps/llama.cpp/models/DeepSeek-R1-Distill-Qwen-1.5B-q8_0.gguf.om 644 0 0
+
+file /etc/xsai-init.conf ${RISCV_ROOTFS_HOME}/rootfsimg/build/xsai-init.conf 644 0 0
+file /etc/xsai-init-common.sh ${RISCV_ROOTFS_HOME}/rootfsimg/xsai-init-common.sh 755 0 0
+file /etc/xsai-workloads.sh ${RISCV_ROOTFS_HOME}/rootfsimg/xsai-workloads.sh 755 0 0
 file /etc/init ${RISCV_ROOTFS_HOME}/rootfsimg/init-disk-xsai.sh 755 0 0
 slink /bin/sh /bin/busybox 755 0 0
 slink /init /etc/init 755 0 0

@@ -53,9 +53,9 @@ static inline void ame_log_init(void) {
 #define AME_LOG(fmt, ...) do { (void)sizeof(fmt); } while (0)
 #endif
 
-#define AME_TILE_M 128
+#define AME_TILE_M 64
 #define AME_TILE_K 64
-#define AME_TILE_N 128
+#define AME_TILE_N 64
 
 // Helper function to check if AME can be used for given dimensions
 // We remove minimum size checks to properly support Q4_0 repacked weights
