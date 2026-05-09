@@ -12,7 +12,7 @@ run_llama_bench()
   run_workload_cmd /bin/llama-bench \
     -m "$LLAMA_MODEL" \
     -t 1 -p 512 -n 0 \
-    --no-warmup --estimate-prompt 1
+    --no-warmup --estimate-layers 1
 }
 
 run_llama_simple()
@@ -28,7 +28,13 @@ run_llama_xsai()
 run_llama_fake_bench_suite()
 {
   status=0
-  bench_args="-t 1 -p 128 -n 0 -r 1 --estimate-prompt 1 --no-warmup"
+  # Default shape is one request with 128 prompt tokens and 128 generated tokens.
+  # --estimate-layers 1 estimates prompt cost from l_out[0,1) and, together
+  # with --estimate-decode-tokens, samples decode layer cost for verbose output.
+  # --estimate-decode-tokens 1 runs one full decode token and scales it to tg128;
+  # 16 is more stable/accurate, but 1 is enough for large models where the error
+  # from fixed per-token overhead is small.
+  bench_args="${LLAMA_FAKE_BENCH_ARGS:--t 1 -p 128 -n 128 -r 1 --estimate-layers 1 --estimate-decode-tokens 1 --no-warmup}"
 
   export GGML_AME_LOG="${GGML_AME_LOG:-0}"
   export GGML_AME_PACKED_Q8="${GGML_AME_PACKED_Q8:-1}"
