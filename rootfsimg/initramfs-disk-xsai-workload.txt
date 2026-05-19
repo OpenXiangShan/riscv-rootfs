@@ -1,0 +1,13 @@
+# llama binaries
+file /bin/llama-simple ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-simple 755 0 0
+file /bin/llama-simple-xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-simple-xsai 755 0 0
+file /bin/llama-bench ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-bench 755 0 0
+file /bin/llama-batched-bench ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-batched-bench 755 0 0
+file /bin/llama-xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/llama-xsai 755 0 0
+# models
+file /root/llama3.2_1b_q8.gguf.om ${RISCV_ROOTFS_HOME}/apps/llama.cpp/models/llama3.2_1b_q8.gguf.om 644 0 0
+file /root/stories15M-q8_0.gguf.om ${RISCV_ROOTFS_HOME}/apps/llama.cpp/models/stories15M-q8_0.gguf.om 644 0 0
+file /root/qwen3_0.6b_q8.gguf.om ${RISCV_ROOTFS_HOME}/apps/llama.cpp/models/qwen3_0.6b_q8.gguf.om 644 0 0
+file /root/DeepSeek-R1-Distill-Qwen-1.5B-q8_0.gguf.om ${RISCV_ROOTFS_HOME}/apps/llama.cpp/models/DeepSeek-R1-Distill-Qwen-1.5B-q8_0.gguf.om 644 0 0
+# workload config
+file /etc/xsai-init.conf ${RISCV_ROOTFS_HOME}/rootfsimg/build/xsai-init.conf 644 0 0

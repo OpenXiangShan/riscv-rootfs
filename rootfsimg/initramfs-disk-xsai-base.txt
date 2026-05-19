@@ -1,0 +1,14 @@
+# busybox + utilities + init scripts
+file /bin/busybox ${RISCV_ROOTFS_HOME}/rootfsimg/build/busybox 755 0 0
+file /bin/before_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/before_workload 755 0 0
+file /bin/gemm_precomp ${RISCV_ROOTFS_HOME}/rootfsimg/build/gemm_precomp 755 0 0
+file /bin/hello_xsai ${RISCV_ROOTFS_HOME}/rootfsimg/build/hello_xsai 755 0 0
+file /bin/after_workload ${RISCV_ROOTFS_HOME}/rootfsimg/build/after_workload 755 0 0
+file /bin/pmu_test ${RISCV_ROOTFS_HOME}/rootfsimg/build/pmu_test 755 0 0
+
+file /etc/xsai-init-common.sh ${RISCV_ROOTFS_HOME}/rootfsimg/xsai-init-common.sh 755 0 0
+file /etc/xsai-workloads.sh ${RISCV_ROOTFS_HOME}/rootfsimg/xsai-workloads.sh 755 0 0
+file /etc/init ${RISCV_ROOTFS_HOME}/rootfsimg/init-disk-xsai.sh 755 0 0
+
+slink /bin/sh /bin/busybox 755 0 0
+slink /init /etc/init 755 0 0
